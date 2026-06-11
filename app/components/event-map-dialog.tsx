@@ -23,6 +23,7 @@ import {
   MAP_ZOOM,
   VENUE_DESTINATION,
   VENUE_ENTRANCE,
+  VENUE_ROUTE_WAYPOINT,
 } from "@/lib/map/venue-location";
 
 interface EventMapDialogProps {
@@ -82,8 +83,9 @@ function drawRoute(map: ResetEvent["target"]) {
   }
 
   const from = map.locationToView(VENUE_ENTRANCE);
+  const waypoint = map.locationToView(VENUE_ROUTE_WAYPOINT);
   const to = map.locationToView(VENUE_DESTINATION);
-  if (!from || !to) {
+  if (!from || !waypoint || !to) {
     return;
   }
 
@@ -95,7 +97,7 @@ function drawRoute(map: ResetEvent["target"]) {
     },
   });
 
-  line.moveTo(from).lineTo(to);
+  line.moveTo(from).lineTo(waypoint).lineTo(to);
   shapeLayer.surface.draw(line);
 }
 
@@ -134,8 +136,15 @@ export default function EventMapDialog({
   }, []);
 
   const handleMapClick = useCallback((event: MapClickEvent) => {
-    logMapView("click", event.target, {
-      location: locationToCoords(event.location),
+    const coords = locationToCoords(event.location);
+    if (!coords) {
+      return;
+    }
+
+    console.log("[EventMap] click coords", {
+      lat: coords.lat,
+      lng: coords.lng,
+      latlng: [coords.lat, coords.lng],
     });
   }, []);
 
@@ -162,8 +171,16 @@ export default function EventMapDialog({
       title={dialogTitle}
       onClose={onClose}
       width="min(calc(100vw - 2rem), 720px)"
+      height="min(90dvh, 90vh)"
       className="event-map-dialog"
-      contentStyle={{ overflow: "hidden", padding: 0 }}
+      contentStyle={{
+        overflow: "hidden",
+        padding: 0,
+        flex: 1,
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+      }}
     >
       <div className="event-map-dialog__map-shell">
         <KendoMap
@@ -171,9 +188,9 @@ export default function EventMapDialog({
           center={MAP_CENTER}
           zoom={MAP_ZOOM}
           pannable
-          zoomable
+          zoomable={false}
           wraparound={false}
-          controls={{ zoom: true, navigator: false }}
+          controls={{ zoom: false, navigator: false }}
           className="event-map-dialog__map"
           onReset={handleReset}
           onPan={handlePan}

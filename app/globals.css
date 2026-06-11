@@ -350,19 +350,28 @@ body {
   max-width: 16rem;
 }
 
-.event-map-dialog .k-dialog {
+.event-map-dialog.k-dialog-wrapper .k-dialog {
   max-width: calc(100vw - 2rem);
+  height: min(90dvh, 90vh) !important;
+  max-height: min(90dvh, 90vh);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-.event-map-dialog .k-dialog-content {
+.event-map-dialog.k-dialog-wrapper .k-dialog-content {
   overflow: hidden;
   padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .event-map-dialog__map-shell {
   width: 100%;
-  height: min(60vh, 520px);
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   box-sizing: border-box;
 }
