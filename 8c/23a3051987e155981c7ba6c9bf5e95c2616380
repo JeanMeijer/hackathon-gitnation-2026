@@ -1,0 +1,26 @@
+app/layout.tsx
+  s_51187be230f306::t_87ec24998ed66b 32-35
+  s_51187be230f306::t_438d7379a6024e 5
+app/profile/page.tsx
+  s_51187be230f306::t_97a569057664eb 1-7
+app/components/bottom-nav.tsx
+  s_51187be230f306::t_482476404f2e78 1-32
+app/page.tsx
+  s_51187be230f306::t_832e889947286a 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "8c23a3051987e155981c7ba6c9bf5e95c2616380",
+  "prompts": {},
+  "sessions": {
+    "s_51187be230f306": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7da1424b-511f-4f2e-9e2e-6f569de2ee4b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  }
+}
