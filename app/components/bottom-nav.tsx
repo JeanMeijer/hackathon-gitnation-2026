@@ -6,12 +6,13 @@ import {
   BottomNavigation,
   BottomNavigationSelectEvent,
 } from "@progress/kendo-react-layout";
-import { heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
+import { calendarIcon, heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
 import { getSavedProfile, subscribeToProfile } from "../profile/profile-data";
 
 const items = [
   { text: "Home", svgIcon: homeIcon, route: "/" },
   { text: "Discover", svgIcon: heartIcon, route: "/recommendations" },
+  { text: "Schedule", svgIcon: calendarIcon, route: "/schedule" },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
 
