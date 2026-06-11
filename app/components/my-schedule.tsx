@@ -138,8 +138,8 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
   );
 
   const itemComponent = useMemo(
-    () => createScheduleItem(handleEventClick),
-    [handleEventClick],
+    () => createScheduleItem(handleEventClick, { variant }),
+    [handleEventClick, variant],
   );
 
   const slotComponent = useMemo(

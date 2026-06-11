@@ -96,13 +96,84 @@ body {
 .my-schedule-embedded .k-event {
   border-radius: 8px;
   border: 1px solid rgba(23, 32, 28, 0.12);
+  background: #fff !important;
   box-shadow: 0 4px 12px rgba(23, 32, 28, 0.06);
+  color: #17201c;
+  padding: 8px 10px;
+  overflow: hidden;
+}
+
+.my-schedule-embedded .k-event .k-event-template {
+  height: 100%;
 }
 
 .my-schedule-embedded .k-event.schedule-event-clickable:hover {
   box-shadow: 0 10px 22px rgba(23, 32, 28, 0.1);
   filter: none;
   transform: translateY(-1px);
+}
+
+.my-schedule-embedded .schedule-event-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  height: 100%;
+}
+
+.my-schedule-embedded .schedule-event-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.my-schedule-embedded .schedule-event-title {
+  flex: 1;
+  min-width: 0;
+  color: #17201c;
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.my-schedule-embedded .schedule-event-meta {
+  color: #5d665f;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.my-schedule-embedded .schedule-event-type {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: lowercase;
+}
+
+.my-schedule-embedded .schedule-event-type-talk {
+  color: #1274ac;
+}
+
+.my-schedule-embedded .schedule-event-type-meeting {
+  color: #3a9b23;
+}
+
+.my-schedule-embedded .schedule-event-type-break {
+  color: #656565;
+}
+
+.my-schedule-embedded .schedule-event-type-custom {
+  color: #7630bc;
 }
 
 .my-schedule-embedded .schedule-slot-empty:hover {

@@ -61,3 +61,23 @@ export function formatEventTimeRange(start: Date, end: Date): string {
   const formatter = new Intl.DateTimeFormat(undefined, TIME_FORMAT);
   return `${formatter.format(start)} – ${formatter.format(end)}`;
 }
+
+export function formatEventStartTime(start: Date): string {
+  return new Intl.DateTimeFormat(undefined, TIME_FORMAT).format(start);
+}
+
+export function getEventLocationLabel(event: ScheduleEvent): string | undefined {
+  if (event.type === "talk") {
+    return event.trackName;
+  }
+
+  if (
+    event.type === "meeting" ||
+    event.type === "custom" ||
+    event.type === "break"
+  ) {
+    return event.location;
+  }
+
+  return undefined;
+}
