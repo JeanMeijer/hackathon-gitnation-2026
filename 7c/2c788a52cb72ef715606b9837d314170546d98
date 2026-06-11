@@ -1,0 +1,26 @@
+app/components/kendo-demo.tsx
+  s_51187be230f306::t_aa068155adeb61 1-27
+package.json
+  s_51187be230f306::t_ef448e4786f32b 12-20
+app/layout.tsx
+  s_51187be230f306::t_34d0a5c980c0c0 3
+app/page.tsx
+  s_51187be230f306::t_b46e52a1384d8c 38
+  s_51187be230f306::t_c8d8b15b04cfc4 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7c2c788a52cb72ef715606b9837d314170546d98",
+  "prompts": {},
+  "sessions": {
+    "s_51187be230f306": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7da1424b-511f-4f2e-9e2e-6f569de2ee4b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  }
+}
