@@ -176,7 +176,7 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
         }
         style={
           embedded
-            ? { height: 520 }
+            ? { height: "100%", minHeight: 0 }
             : { height: "calc(100dvh - 7.5rem)", minHeight: 520 }
         }
       >
