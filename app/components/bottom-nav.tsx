@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BottomNavigation,
@@ -8,7 +8,6 @@ import {
 } from "@progress/kendo-react-layout";
 import type { SVGIcon } from "@progress/kendo-svg-icons";
 import { calendarIcon, heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
-import { getSavedProfile, subscribeToProfile } from "../profile/profile-data";
 
 interface NavItem {
   text: string;
@@ -32,11 +31,22 @@ const items: NavItem[] = [
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const hasProfile = useSyncExternalStore(
-    subscribeToProfile,
-    () => Boolean(getSavedProfile()),
-    () => false,
-  );
+  const [hasProfile, setHasProfile] = useState(false);
+
+  // Show navigation only once a profile exists in the DB.
+  useEffect(() => {
+    let active = true;
+    fetch("/api/profile")
+      .then((res) => {
+        if (active) setHasProfile(res.ok);
+      })
+      .catch(() => {
+        if (active) setHasProfile(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
 
   if (pathname === "/onboarding" || !hasProfile) {
     return null;
@@ -54,7 +64,9 @@ export function BottomNav() {
             ? pathname === item.route
             : pathname.startsWith(item.route),
       }))}
-      onSelect={(e) => router.push(e.itemTarget.route)}
+      onSelect={(e: BottomNavigationSelectEvent) =>
+        router.push(e.itemTarget.route)
+      }
     />
   );
 }

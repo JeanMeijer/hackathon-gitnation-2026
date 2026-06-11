@@ -1,25 +1,39 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Chip } from "@progress/kendo-react-buttons";
 import { Avatar, Card, CardBody } from "@progress/kendo-react-layout";
 import { editToolsIcon, plusIcon } from "@progress/kendo-svg-icons";
 import {
-  defaultUserProfile,
-  getProfileSnapshot,
+  emptyUserProfile,
   getInitials,
-  subscribeToProfile,
+  type UserProfile,
 } from "./profile-data";
 import styles from "./profile.module.css";
 
 export default function ProfileView() {
   const router = useRouter();
-  const profile = useSyncExternalStore(
-    subscribeToProfile,
-    () => getProfileSnapshot(defaultUserProfile),
-    () => defaultUserProfile,
-  );
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/profile")
+      .then((res) => (res.ok ? res.json() : emptyUserProfile))
+      .then((data: UserProfile) => {
+        if (active) setProfile(data);
+      })
+      .catch(() => {
+        if (active) setProfile(emptyUserProfile);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!profile) {
+    return <main className={styles.shell}>Loading…</main>;
+  }
 
   return (
     <main className={styles.shell}>
@@ -73,16 +87,19 @@ export default function ProfileView() {
               Interests
             </h2>
             <div className={styles.chipList}>
-              {profile.interests.map((interest) => (
-                <Chip
-                  key={interest}
-                  className={styles.chip}
-                  text={interest}
-                  rounded="full"
-                  fillMode="outline"
-                  themeColor="info"
-                />
-              ))}
+              {profile.interests.map((interest) => {
+                const isTech = profile.interestTypes?.[interest] !== "non_tech";
+                return (
+                  <Chip
+                    key={interest}
+                    className={styles.chip}
+                    text={interest}
+                    rounded="full"
+                    fillMode={isTech ? "outline" : "solid"}
+                    themeColor={isTech ? "info" : "warning"}
+                  />
+                );
+              })}
             </div>
           </section>
         </CardBody>
