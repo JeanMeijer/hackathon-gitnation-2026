@@ -139,7 +139,7 @@ function EventNotFound() {
           fillMode="flat"
           themeColor="primary"
           svgIcon={chevronLeftIcon}
-          onClick={() => router.push("/schedule")}
+          onClick={() => router.push("/")}
         >
           Back to schedule
         </Button>
@@ -151,7 +151,7 @@ function EventNotFound() {
           This event is not in your schedule. It may have been removed or the
           link is incorrect.
         </p>
-        <Button themeColor="primary" onClick={() => router.push("/schedule")}>
+        <Button themeColor="primary" onClick={() => router.push("/")}>
           Back to schedule
         </Button>
       </div>
@@ -179,7 +179,7 @@ export default function EventPage({ eventId }: EventPageProps) {
           fillMode="flat"
           themeColor="primary"
           svgIcon={chevronLeftIcon}
-          onClick={() => router.push("/schedule")}
+          onClick={() => router.push("/")}
         >
           Back to schedule
         </Button>

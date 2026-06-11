@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import InterestWordCloud from "./interest-word-cloud";
+import SchedulePage from "./schedule-page";
 import { getSavedProfile, subscribeToProfile } from "../profile/profile-data";
 
 export default function OnboardingGate() {
@@ -23,5 +23,5 @@ export default function OnboardingGate() {
     return null;
   }
 
-  return <InterestWordCloud />;
+  return <SchedulePage />;
 }

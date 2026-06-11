@@ -7,7 +7,7 @@ import {
   BottomNavigationSelectEvent,
 } from "@progress/kendo-react-layout";
 import type { SVGIcon } from "@progress/kendo-svg-icons";
-import { calendarIcon, heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
+import { heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
 import { getSavedProfile, subscribeToProfile } from "../profile/profile-data";
 
 interface NavItem {
@@ -18,14 +18,13 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
-  { text: "Home", svgIcon: homeIcon, route: "/" },
-  { text: "Discover", svgIcon: heartIcon, route: "/recommendations" },
   {
-    text: "Schedule",
-    svgIcon: calendarIcon,
-    route: "/schedule",
-    matchRoutes: ["/schedule", "/event"],
+    text: "Home",
+    svgIcon: homeIcon,
+    route: "/",
+    matchRoutes: ["/", "/event"],
   },
+  { text: "Discover", svgIcon: heartIcon, route: "/recommendations" },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
 
