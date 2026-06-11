@@ -1,6 +1,7 @@
 "use client";
 
 import { Children, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   DayView,
   Scheduler,
@@ -12,7 +13,7 @@ import ActivityPickerDialog, {
   type ActivityPickerDraft,
 } from "@/app/components/activity-picker-dialog";
 import ScheduleHeader from "@/app/components/schedule-header";
-import ScheduleItem from "@/app/components/schedule-item";
+import { createScheduleItem } from "@/app/components/schedule-item";
 import { createScheduleSlot } from "@/app/components/schedule-slot";
 import {
   clampToConferenceRange,
@@ -38,6 +39,7 @@ function NavigationOnlySchedulerHeader(props: SchedulerHeaderProps) {
 }
 
 export default function MySchedule() {
+  const router = useRouter();
   const scheduleRef = useRef<HTMLDivElement>(null);
   const [date, setDate] = useState(() => getInitialScheduleDate());
   const [data, setData] = useState<ScheduleEvent[]>(() =>
@@ -77,6 +79,18 @@ export default function MySchedule() {
     setData((current) => [...current, event]);
   }, []);
 
+  const handleEventClick = useCallback(
+    (eventId: string) => {
+      router.push(`/event/${eventId}`);
+    },
+    [router],
+  );
+
+  const itemComponent = useMemo(
+    () => createScheduleItem(handleEventClick),
+    [handleEventClick],
+  );
+
   const slotComponent = useMemo(
     () => createScheduleSlot(handleEmptySlotClick),
     [handleEmptySlotClick]
@@ -112,7 +126,7 @@ export default function MySchedule() {
           editable={false}
           footer={() => null}
           header={NavigationOnlySchedulerHeader}
-          item={ScheduleItem}
+          item={itemComponent}
           slot={slotComponent}
           resources={[EVENT_TYPE_RESOURCE]}
           onDateChange={handleDateChange}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import InterestWordCloud from "./interest-word-cloud";
+import SchedulePage from "./schedule-page";
 
 export default function OnboardingGate() {
   const router = useRouter();
@@ -33,5 +33,5 @@ export default function OnboardingGate() {
     return null;
   }
 
-  return <InterestWordCloud />;
+  return <SchedulePage />;
 }
