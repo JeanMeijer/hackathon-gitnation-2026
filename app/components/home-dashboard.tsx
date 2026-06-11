@@ -2,9 +2,9 @@
 
 import { useMemo, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Chip } from "@progress/kendo-react-buttons";
+import { Button } from "@progress/kendo-react-buttons";
 import { Card, CardBody } from "@progress/kendo-react-layout";
-import { calendarIcon, envelopeIcon, heartIcon } from "@progress/kendo-svg-icons";
+import { envelopeIcon } from "@progress/kendo-svg-icons";
 import {
   getSentInvites,
   receivedInvites,
@@ -16,8 +16,14 @@ import {
   subscribeToBookedMeetings,
   type BookedMeeting,
 } from "@/lib/schedule/booked-meetings";
+import {
+  getCustomScheduleEvents,
+  subscribeToCustomScheduleEvents,
+} from "@/lib/schedule/custom-events";
+import { createInitialScheduleEvents } from "@/lib/schedule/event-data";
 import { MOCK_USER_SCHEDULE } from "@/lib/schedule/mock-events";
 import type { ScheduleEvent } from "@/lib/schedule/types";
+import MySchedule from "./my-schedule";
 import styles from "./home-dashboard.module.css";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -46,105 +52,55 @@ function formatLocation(event: ScheduleEvent) {
 
 const emptySentInvites: SentInvite[] = [];
 const emptyBookedMeetings: BookedMeeting[] = [];
+const emptyCustomEvents: ScheduleEvent[] = [];
 
 export default function HomeDashboard() {
   const router = useRouter();
   const sentInvites = useSyncExternalStore(
     subscribeToSentInvites,
     getSentInvites,
-    () => emptySentInvites,
+    () => emptySentInvites
+  );
+  const baseEvents = useMemo(
+    () => createInitialScheduleEvents(MOCK_USER_SCHEDULE),
+    []
   );
   const bookedMeetings = useSyncExternalStore(
     subscribeToBookedMeetings,
     getBookedMeetings,
-    () => emptyBookedMeetings,
+    () => emptyBookedMeetings
   );
-  const upcomingEvents = useMemo(
+  const customEvents = useSyncExternalStore(
+    subscribeToCustomScheduleEvents,
+    getCustomScheduleEvents,
+    () => emptyCustomEvents
+  );
+  const scheduleEvents = useMemo(
     () =>
-      [...MOCK_USER_SCHEDULE, ...bookedMeetings]
-        .sort((a, b) => a.start.getTime() - b.start.getTime())
-        .slice(0, 4),
-    [bookedMeetings],
+      [...baseEvents, ...bookedMeetings, ...customEvents].sort(
+        (a, b) => a.start.getTime() - b.start.getTime()
+      ),
+    [baseEvents, bookedMeetings, customEvents]
   );
   const meets = useMemo(
     () =>
-      [...MOCK_USER_SCHEDULE, ...bookedMeetings]
+      scheduleEvents
         .filter((event) => event.type === "meeting")
         .sort((a, b) => a.start.getTime() - b.start.getTime()),
-    [bookedMeetings],
+    [scheduleEvents]
   );
 
   return (
     <main className={styles.shell}>
       <div className={styles.wrap}>
         <header className={styles.hero}>
-          <div>
-            <h1 className={styles.title}>Your GitNation day</h1>
-            <p className={styles.subtitle}>
-              Upcoming sessions, scheduled meets, and invite activity in one
-              place.
-            </p>
-          </div>
-          <div className={styles.heroActions}>
-            <Button
-              themeColor="primary"
-              svgIcon={heartIcon}
-              onClick={() => router.push("/recommendations")}
-            >
-              Find people
-            </Button>
-            <Button
-              fillMode="outline"
-              svgIcon={calendarIcon}
-              onClick={() => router.push("/schedule")}
-            >
-              Open schedule
-            </Button>
-          </div>
+          <h1 className={styles.title}>Your GitNation day</h1>
         </header>
 
         <section className={styles.grid}>
           <Card className={styles.card} orientation="vertical">
-            <CardBody className={styles.cardBody}>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>Upcoming events</h2>
-                <Button
-                  fillMode="flat"
-                  themeColor="primary"
-                  onClick={() => router.push("/schedule")}
-                >
-                  View all
-                </Button>
-              </div>
-              <div className={styles.list}>
-                {upcomingEvents.map((event) => (
-                  <article key={event.id} className={styles.eventItem}>
-                    <div className={styles.time} aria-hidden="true">
-                      <span className={styles.day}>
-                        {dateFormatter.format(event.start)}
-                      </span>
-                      <span className={styles.hour}>
-                        {timeFormatter.format(event.start)}
-                      </span>
-                    </div>
-                    <div className={styles.eventContent}>
-                      <p className={styles.eventTitle}>{event.title}</p>
-                      <p className={styles.eventMeta}>
-                        {formatLocation(event)} · {timeFormatter.format(event.end)}
-                      </p>
-                      <div className={styles.chipRow}>
-                        <Chip
-                          className={styles.chip}
-                          text={event.type}
-                          rounded="full"
-                          fillMode="outline"
-                          themeColor={event.type === "meeting" ? "success" : "info"}
-                        />
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
+            <CardBody className={styles.scheduleCardBody}>
+              <MySchedule variant="embedded" />
             </CardBody>
           </Card>
 
@@ -178,7 +134,9 @@ export default function HomeDashboard() {
                     type="button"
                     onClick={() => router.push("/invites#sent")}
                   >
-                    <span className={styles.statValue}>{sentInvites.length}</span>
+                    <span className={styles.statValue}>
+                      {sentInvites.length}
+                    </span>
                     <span className={styles.statLabel}>sent</span>
                   </button>
                 </div>

@@ -8,7 +8,6 @@ import {
 } from "@progress/kendo-react-layout";
 import type { SVGIcon } from "@progress/kendo-svg-icons";
 import {
-  calendarIcon,
   envelopeIcon,
   heartIcon,
   homeIcon,
@@ -30,12 +29,6 @@ const items: NavItem[] = [
     matchRoutes: ["/", "/event"],
   },
   { text: "Discover", svgIcon: heartIcon, route: "/recommendations" },
-  {
-    text: "Schedule",
-    svgIcon: calendarIcon,
-    route: "/schedule",
-    matchRoutes: ["/schedule"],
-  },
   { text: "Invites", svgIcon: envelopeIcon, route: "/invites" },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];

@@ -54,6 +54,37 @@ body {
   background-color: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 8%, transparent);
 }
 
+.my-schedule-embed {
+  background: #fbfcfa;
+}
+
+.my-schedule-embedded .k-scheduler-toolbar,
+.my-schedule-embedded .k-scheduler-header,
+.my-schedule-embedded .k-scheduler-layout td {
+  border-color: rgba(23, 32, 28, 0.1);
+}
+
+.my-schedule-embedded .k-scheduler-toolbar,
+.my-schedule-embedded .k-scheduler-header {
+  background: #fbfcfa;
+}
+
+.my-schedule-embedded .k-event {
+  border-radius: 8px;
+  border: 1px solid rgba(23, 32, 28, 0.12);
+  box-shadow: 0 4px 12px rgba(23, 32, 28, 0.06);
+}
+
+.my-schedule-embedded .k-event.schedule-event-clickable:hover {
+  box-shadow: 0 10px 22px rgba(23, 32, 28, 0.1);
+  filter: none;
+  transform: translateY(-1px);
+}
+
+.my-schedule-embedded .schedule-slot-empty:hover {
+  background-color: rgba(14, 165, 233, 0.08);
+}
+
 .activity-picker-list {
   scrollbar-gutter: stable;
 }

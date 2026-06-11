@@ -74,7 +74,12 @@ function getInitialDateFromQuery() {
     : getInitialScheduleDate();
 }
 
-export default function MySchedule() {
+interface MyScheduleProps {
+  variant?: "page" | "embedded";
+}
+
+export default function MySchedule({ variant = "page" }: MyScheduleProps) {
+  const embedded = variant === "embedded";
   const router = useRouter();
   const scheduleRef = useRef<HTMLDivElement>(null);
   const [date, setDate] = useState(() => getInitialDateFromQuery());
@@ -169,14 +174,22 @@ export default function MySchedule() {
 
   return (
     <>
-      <ScheduleHeader onNewActivity={handleNewActivity} />
+      {!embedded ? <ScheduleHeader onNewActivity={handleNewActivity} /> : null}
       <div
         ref={scheduleRef}
-        className="min-h-0 flex-1 overflow-hidden"
-        style={{ height: "calc(100dvh - 7.5rem)", minHeight: 520 }}
+        className={
+          embedded
+            ? "my-schedule-embed overflow-hidden"
+            : "min-h-0 flex-1 overflow-hidden"
+        }
+        style={
+          embedded
+            ? { height: 520 }
+            : { height: "calc(100dvh - 7.5rem)", minHeight: 520 }
+        }
       >
         <Scheduler
-          className="my-schedule"
+          className={embedded ? "my-schedule my-schedule-embedded" : "my-schedule"}
           style={{ height: "100%" }}
           date={date}
           data={data}

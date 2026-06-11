@@ -41,7 +41,7 @@ const emptySentInvites: SentInvite[] = [];
 const emptyBookedMeetings: BookedMeeting[] = [];
 
 function getScheduleHref(date: Date) {
-  return `/schedule?date=${formatScheduleDateParam(date)}`;
+  return `/?date=${formatScheduleDateParam(date)}`;
 }
 
 function addMinutes(date: Date, minutes: number) {
