@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useMemo,
-  useState,
-  useSyncExternalStore,
-  type FormEvent,
-} from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@progress/kendo-react-buttons";
 import { MultiSelect } from "@progress/kendo-react-dropdowns";
@@ -13,15 +8,7 @@ import { Input, TextArea } from "@progress/kendo-react-inputs";
 import { Label } from "@progress/kendo-react-labels";
 import { Card, CardBody } from "@progress/kendo-react-layout";
 import { cancelIcon, saveIcon } from "@progress/kendo-svg-icons";
-import {
-  availableInterests,
-  defaultUserProfile,
-  emptyUserProfile,
-  getProfileSnapshot,
-  saveProfile,
-  subscribeToProfile,
-  type UserProfile,
-} from "../profile-data";
+import { emptyUserProfile, type UserProfile } from "../profile-data";
 import styles from "../profile.module.css";
 
 type CreateProfileFormProps = {
@@ -54,20 +41,30 @@ export default function CreateProfileForm({
   title = "Create profile",
 }: CreateProfileFormProps) {
   const router = useRouter();
-  const fallbackProfile = showCancel ? defaultUserProfile : emptyUserProfile;
-  const storedProfile = useSyncExternalStore(
-    subscribeToProfile,
-    () => getProfileSnapshot(fallbackProfile),
-    () => fallbackProfile,
-  );
-  const [draftProfile, setDraftProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile>(emptyUserProfile);
+  const [interestOptions, setInterestOptions] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
-  const profile = draftProfile ?? storedProfile;
+  const [saving, setSaving] = useState(false);
 
-  const interestOptions = useMemo(
-    () => [...new Set([...availableInterests, ...profile.interests])],
-    [profile.interests],
-  );
+  // Load the catalog of selectable interests from the DB.
+  useEffect(() => {
+    fetch("/api/interests")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: { name: string }[]) =>
+        setInterestOptions(data.map((interest) => interest.name)),
+      )
+      .catch(() => setInterestOptions([]));
+  }, []);
+
+  // Prefill with the current profile (edit mode shows existing data).
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: UserProfile | null) => {
+        if (data) setProfile(data);
+      })
+      .catch(() => {});
+  }, []);
   const cleanedProfile = cleanProfile(profile);
   const hasError = submitted && !cleanedProfile.name;
   const canSave =
@@ -81,22 +78,34 @@ export default function CreateProfileForm({
     field: Key,
     value: UserProfile[Key],
   ) {
-    setDraftProfile((currentProfile) => ({
-      ...(currentProfile ?? profile),
+    setProfile((currentProfile) => ({
+      ...currentProfile,
       [field]: value,
     }));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitted(true);
 
-    if (!canSave) {
+    if (!canSave || saving) {
       return;
     }
 
-    saveProfile(cleanedProfile);
-    router.push(redirectTo);
+    setSaving(true);
+    try {
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cleanedProfile),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to save profile");
+      }
+      router.push(redirectTo);
+    } catch {
+      setSaving(false);
+    }
   }
 
   return (
@@ -169,9 +178,8 @@ export default function CreateProfileForm({
                 id="profile-interests-input"
                 data={interestOptions}
                 value={profile.interests}
-                allowCustom
                 autoClose={false}
-                placeholder="Select or type interests"
+                placeholder="Select interests"
                 onChange={(event) =>
                   updateField("interests", event.value as string[])
                 }
@@ -198,9 +206,9 @@ export default function CreateProfileForm({
                 type="submit"
                 themeColor="primary"
                 svgIcon={saveIcon}
-                disabled={submitted && !canSave}
+                disabled={saving || (submitted && !canSave)}
               >
-                {submitLabel}
+                {saving ? "Saving…" : submitLabel}
               </Button>
             </div>
           </form>
