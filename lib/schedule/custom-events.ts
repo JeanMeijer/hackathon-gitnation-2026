@@ -71,6 +71,17 @@ export function addCustomScheduleEvent(event: ScheduleEvent) {
   return writeEvents([...getCustomScheduleEvents(), event]);
 }
 
+export function clearCustomScheduleEvents() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(customEventsStorageKey);
+  cachedRawEvents = null;
+  cachedEvents = [];
+  window.dispatchEvent(new Event(customEventsEventName));
+}
+
 export function subscribeToCustomScheduleEvents(callback: () => void) {
   if (typeof window === "undefined") {
     return () => {};
