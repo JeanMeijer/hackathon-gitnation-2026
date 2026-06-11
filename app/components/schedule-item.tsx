@@ -12,15 +12,20 @@ function isPastEvent(end: Date, now: number = Date.now()): boolean {
 export function createScheduleItem(onEventClick: (eventId: string) => void) {
   return function ScheduleItem(props: SchedulerItemProps) {
     const past = isPastEvent(props.end);
+    const generated = props.dataItem?.generated === true;
     const className = [
       props.className,
       past ? "k-event-past" : undefined,
-      "schedule-event-clickable",
+      generated ? undefined : "schedule-event-clickable",
     ]
       .filter(Boolean)
       .join(" ");
 
     const handleClick: SchedulerItemProps["onClick"] = (event) => {
+      if (generated) {
+        return;
+      }
+
       props.onClick?.(event);
 
       const eventId = props.dataItem?.id;
@@ -33,14 +38,11 @@ export function createScheduleItem(onEventClick: (eventId: string) => void) {
       <SchedulerItem
         {...props}
         className={className}
-        style={
-          past
-            ? {
-                ...props.style,
-                opacity: 0.55,
-              }
-            : props.style
-        }
+        style={{
+          ...props.style,
+          ...(past ? { opacity: 0.55 } : null),
+          ...(generated ? { cursor: "default" } : null),
+        }}
         onClick={handleClick}
       />
     );

@@ -20,6 +20,18 @@ const FAKE_NICKS = [
   "@scope_sky",
 ];
 
+/** Conference venue spots for demo meetups. */
+const MEETUP_LOCATIONS = [
+  "Near first hall",
+  "Near second hall",
+  "Coffee corner",
+  "Sponsor lounge",
+  "Registration desk",
+  "Rooftop terrace",
+  "Workshop room B",
+  "Main stage foyer",
+];
+
 const MEETUP_MINUTES = 15;
 const DAY_START_HOUR = 8;
 const DAY_END_HOUR = 20;
@@ -117,14 +129,17 @@ export function generateMeetups(
     }
 
     const slot = pickRandom(freeSlots);
+    const location = pickRandom(MEETUP_LOCATIONS);
 
     meetups.push({
       id: crypto.randomUUID(),
       type: "meeting",
-      title: `meeting for "${interest}"`,
+      title: `meeting for "${interest}" @ ${location}`,
       start: new Date(slot.start),
       end: new Date(slot.end),
+      location,
       attendees: pickSome(FAKE_NICKS, 1 + Math.floor(Math.random() * 3)),
+      generated: true,
     });
 
     placedByInterest.set(interest, [...sameInterest, slot]);
