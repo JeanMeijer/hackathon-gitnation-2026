@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Children,
   useCallback,
   useEffect,
   useMemo,
@@ -14,12 +13,11 @@ import {
   DayView,
   Scheduler,
   SchedulerDateChangeEvent,
-  SchedulerHeader,
-  type SchedulerHeaderProps,
 } from "@progress/kendo-react-scheduler";
 import ActivityPickerDialog, {
   type ActivityPickerDraft,
 } from "@/app/components/activity-picker-dialog";
+import ScheduleDateNavHeader from "@/app/components/schedule-date-nav-header";
 import ScheduleHeader from "@/app/components/schedule-header";
 import { createScheduleItem } from "@/app/components/schedule-item";
 import { createScheduleSlot } from "@/app/components/schedule-slot";
@@ -50,12 +48,6 @@ import {
   scrollToCurrentTimeMarkerWhenReady,
 } from "@/lib/schedule/scroll-to-current-time";
 import type { ScheduleEvent } from "@/lib/schedule/types";
-
-function NavigationOnlySchedulerHeader(props: SchedulerHeaderProps) {
-  const navigation = Children.toArray(props.children)[0];
-
-  return <SchedulerHeader {...props}>{navigation}</SchedulerHeader>;
-}
 
 const emptyBookedMeetings: BookedMeeting[] = [];
 const emptyCustomEvents: ScheduleEvent[] = [];
@@ -196,7 +188,7 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
           defaultView="day"
           editable={false}
           footer={() => null}
-          header={NavigationOnlySchedulerHeader}
+          header={ScheduleDateNavHeader}
           item={itemComponent}
           slot={slotComponent}
           resources={[EVENT_TYPE_RESOURCE]}

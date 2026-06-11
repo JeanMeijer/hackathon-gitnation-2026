@@ -29,6 +29,30 @@ body {
   --kendo-scheduler-height: 100%;
 }
 
+.my-schedule .k-scheduler-toolbar {
+  justify-content: center;
+}
+
+.my-schedule .k-scheduler-head {
+  display: none;
+}
+
+.schedule-date-nav {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.schedule-date-nav-group {
+  align-items: center;
+}
+
+.schedule-date-nav-label {
+  min-width: 7.5rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
 .my-schedule .k-event.k-event-past {
   filter: grayscale(0.4);
 }
