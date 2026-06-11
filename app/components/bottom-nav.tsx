@@ -1,10 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import {
-  BottomNavigation,
-  BottomNavigationSelectEvent,
-} from "@progress/kendo-react-layout";
+import { BottomNavigation } from "@progress/kendo-react-layout";
 import { homeIcon, userIcon } from "@progress/kendo-svg-icons";
 
 const items = [
@@ -12,7 +9,7 @@ const items = [
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
 
-export default function BottomNav() {
+export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -24,7 +21,7 @@ export default function BottomNav() {
         ...item,
         selected: pathname === item.route,
       }))}
-      onSelect={(e: BottomNavigationSelectEvent) =>
+      onSelect={(e) =>
         router.push(e.itemTarget.route)
       }
     />
