@@ -1,0 +1,89 @@
+.avatar {
+  --avatar-accent: #dff9ff;
+  --avatar-end: #14b8a6;
+  --avatar-start: #0ea5e9;
+  --avatar-size: 84px;
+  --avatar-font-size: 1.65rem;
+  --avatar-dot-size: 14px;
+  --avatar-dot-offset: 11px;
+  --avatar-dot-border: 3px;
+  --avatar-highlight-size: 7px;
+  --avatar-highlight-stop: 8px;
+
+  position: relative;
+  overflow: hidden;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border: 3px solid var(--avatar-accent);
+  background:
+    radial-gradient(
+      circle at 72% 22%,
+      var(--avatar-accent) 0 var(--avatar-highlight-size),
+      transparent var(--avatar-highlight-stop)
+    ),
+    linear-gradient(135deg, var(--avatar-start), var(--avatar-end)) !important;
+  color: #ffffff;
+  font-size: var(--avatar-font-size);
+  font-weight: 800;
+  box-shadow: 0 14px 28px rgba(25, 169, 116, 0.18);
+}
+
+.avatar::after {
+  position: absolute;
+  right: var(--avatar-dot-offset);
+  bottom: var(--avatar-dot-offset);
+  width: var(--avatar-dot-size);
+  height: var(--avatar-dot-size);
+  border: var(--avatar-dot-border) solid rgba(255, 255, 255, 0.82);
+  border-radius: 999px;
+  background: var(--avatar-accent);
+  content: "";
+}
+
+.small {
+  --avatar-size: 46px;
+  --avatar-font-size: 0.92rem;
+  --avatar-dot-size: 8px;
+  --avatar-dot-offset: 6px;
+  --avatar-dot-border: 2px;
+  --avatar-highlight-size: 4px;
+  --avatar-highlight-stop: 5px;
+}
+
+.medium {
+  --avatar-size: 84px;
+  --avatar-font-size: 1.65rem;
+  --avatar-dot-size: 14px;
+  --avatar-dot-offset: 11px;
+  --avatar-dot-border: 3px;
+  --avatar-highlight-size: 7px;
+  --avatar-highlight-stop: 8px;
+}
+
+.large {
+  --avatar-size: 104px;
+  --avatar-font-size: 2rem;
+  --avatar-dot-size: 16px;
+  --avatar-dot-offset: 13px;
+  --avatar-dot-border: 3px;
+  --avatar-highlight-size: 9px;
+  --avatar-highlight-stop: 10px;
+}
+
+@media (max-width: 520px) {
+  .medium {
+    --avatar-size: 68px;
+    --avatar-font-size: 1.35rem;
+    --avatar-dot-size: 11px;
+    --avatar-dot-offset: 9px;
+  }
+}
+
+@media (max-width: 460px) {
+  .large {
+    --avatar-size: 90px;
+    --avatar-font-size: 1.7rem;
+    --avatar-dot-size: 14px;
+    --avatar-dot-offset: 11px;
+  }
+}

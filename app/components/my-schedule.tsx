@@ -1,6 +1,14 @@
 "use client";
 
-import { Children, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Children,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   DayView,
@@ -19,11 +27,22 @@ import {
   clampToConferenceRange,
   CONFERENCE_DATE_RANGE,
   getInitialScheduleDate,
+  parseScheduleDateParam,
 } from "@/lib/schedule/conference";
+import {
+  addCustomScheduleEvent,
+  getCustomScheduleEvents,
+  subscribeToCustomScheduleEvents,
+} from "@/lib/schedule/custom-events";
 import {
   createDefaultEventDraft,
   createInitialScheduleEvents,
 } from "@/lib/schedule/event-data";
+import {
+  getBookedMeetings,
+  subscribeToBookedMeetings,
+  type BookedMeeting,
+} from "@/lib/schedule/booked-meetings";
 import { MOCK_USER_SCHEDULE } from "@/lib/schedule/mock-events";
 import { EVENT_TYPE_RESOURCE } from "@/lib/schedule/resources";
 import {
@@ -38,16 +57,51 @@ function NavigationOnlySchedulerHeader(props: SchedulerHeaderProps) {
   return <SchedulerHeader {...props}>{navigation}</SchedulerHeader>;
 }
 
+const emptyBookedMeetings: BookedMeeting[] = [];
+const emptyCustomEvents: ScheduleEvent[] = [];
+
+function getInitialDateFromQuery() {
+  if (typeof window === "undefined") {
+    return getInitialScheduleDate();
+  }
+
+  const requestedDate = parseScheduleDateParam(
+    new URLSearchParams(window.location.search).get("date")
+  );
+
+  return requestedDate
+    ? clampToConferenceRange(requestedDate, CONFERENCE_DATE_RANGE)
+    : getInitialScheduleDate();
+}
+
 export default function MySchedule() {
   const router = useRouter();
   const scheduleRef = useRef<HTMLDivElement>(null);
-  const [date, setDate] = useState(() => getInitialScheduleDate());
-  const [data, setData] = useState<ScheduleEvent[]>(() =>
-    createInitialScheduleEvents(MOCK_USER_SCHEDULE)
+  const [date, setDate] = useState(() => getInitialDateFromQuery());
+  const baseEvents = useMemo(
+    () => createInitialScheduleEvents(MOCK_USER_SCHEDULE),
+    []
+  );
+  const bookedMeetings = useSyncExternalStore(
+    subscribeToBookedMeetings,
+    getBookedMeetings,
+    () => emptyBookedMeetings
+  );
+  const customEvents = useSyncExternalStore(
+    subscribeToCustomScheduleEvents,
+    getCustomScheduleEvents,
+    () => emptyCustomEvents
   );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerDraft, setPickerDraft] = useState<ActivityPickerDraft | null>(
     null
+  );
+  const data = useMemo(
+    () =>
+      [...baseEvents, ...bookedMeetings, ...customEvents].sort(
+        (a, b) => a.start.getTime() - b.start.getTime()
+      ),
+    [baseEvents, bookedMeetings, customEvents]
   );
 
   const openPicker = useCallback((draft: ActivityPickerDraft) => {
@@ -76,7 +130,7 @@ export default function MySchedule() {
   }, []);
 
   const handleConfirmActivity = useCallback((event: ScheduleEvent) => {
-    setData((current) => [...current, event]);
+    addCustomScheduleEvent(event);
   }, []);
 
   const handleEventClick = useCallback(
@@ -116,7 +170,11 @@ export default function MySchedule() {
   return (
     <>
       <ScheduleHeader onNewActivity={handleNewActivity} />
-      <div ref={scheduleRef} className="min-h-0 flex-1">
+      <div
+        ref={scheduleRef}
+        className="min-h-0 flex-1 overflow-hidden"
+        style={{ height: "calc(100dvh - 7.5rem)", minHeight: 520 }}
+      >
         <Scheduler
           className="my-schedule"
           style={{ height: "100%" }}

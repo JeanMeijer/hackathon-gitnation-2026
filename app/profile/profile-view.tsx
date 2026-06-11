@@ -3,13 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Chip } from "@progress/kendo-react-buttons";
-import { Avatar, Card, CardBody } from "@progress/kendo-react-layout";
+import { Card, CardBody } from "@progress/kendo-react-layout";
 import { editToolsIcon, plusIcon } from "@progress/kendo-svg-icons";
-import {
-  emptyUserProfile,
-  getInitials,
-  type UserProfile,
-} from "./profile-data";
+import ProfileAvatar from "../components/profile-avatar";
+import { emptyUserProfile, type UserProfile } from "./profile-data";
 import styles from "./profile.module.css";
 
 export default function ProfileView() {
@@ -59,15 +56,7 @@ export default function ProfileView() {
           </div>
 
           <section className={styles.identity} aria-labelledby="profile-name">
-            <Avatar
-              className={styles.avatar}
-              type="text"
-              rounded="full"
-              themeColor="primary"
-              aria-hidden="true"
-            >
-              {getInitials(profile.name)}
-            </Avatar>
+            <ProfileAvatar name={profile.name || "Profile"} size="medium" />
             <div className={styles.headerText}>
               <h1 id="profile-name" className={styles.name}>
                 {profile.name}
@@ -84,19 +73,25 @@ export default function ProfileView() {
             aria-labelledby="profile-interests"
           >
             <h2 id="profile-interests" className={styles.interestsTitle}>
-              Interests
+              Interest cloud
             </h2>
-            <div className={styles.chipList}>
+            <div
+              className={`${styles.chipList} ${styles.interestCloud}`}
+              role="list"
+              aria-label="Profile interests"
+            >
               {profile.interests.map((interest) => {
                 const isTech = profile.interestTypes?.[interest] !== "non_tech";
                 return (
                   <Chip
                     key={interest}
-                    className={styles.chip}
+                    className={`${styles.chip} ${styles.interestWord}`}
                     text={interest}
+                    size="large"
                     rounded="full"
                     fillMode={isTech ? "outline" : "solid"}
                     themeColor={isTech ? "info" : "warning"}
+                    role="listitem"
                   />
                 );
               })}
