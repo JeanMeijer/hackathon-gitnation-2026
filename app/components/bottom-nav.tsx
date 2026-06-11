@@ -7,7 +7,13 @@ import {
   BottomNavigationSelectEvent,
 } from "@progress/kendo-react-layout";
 import type { SVGIcon } from "@progress/kendo-svg-icons";
-import { heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
+import {
+  calendarIcon,
+  envelopeIcon,
+  heartIcon,
+  homeIcon,
+  userIcon,
+} from "@progress/kendo-svg-icons";
 
 interface NavItem {
   text: string;
@@ -24,6 +30,13 @@ const items: NavItem[] = [
     matchRoutes: ["/", "/event"],
   },
   { text: "Discover", svgIcon: heartIcon, route: "/recommendations" },
+  {
+    text: "Schedule",
+    svgIcon: calendarIcon,
+    route: "/schedule",
+    matchRoutes: ["/schedule"],
+  },
+  { text: "Invites", svgIcon: envelopeIcon, route: "/invites" },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
 
@@ -32,7 +45,7 @@ export function BottomNav() {
   const router = useRouter();
   const [hasProfile, setHasProfile] = useState(false);
 
-  // Show navigation only once a profile exists in the DB.
+  // Show navigation only once a profile exists in the mock API.
   useEffect(() => {
     let active = true;
     fetch("/api/profile")
@@ -57,14 +70,14 @@ export function BottomNav() {
       themeColor="primary"
       items={items.map((item) => ({
         ...item,
-      selected: item.matchRoutes
-        ? item.matchRoutes.some(
-            (route) =>
-              pathname === route || pathname.startsWith(`${route}/`),
-          )
-        : item.route === "/"
-          ? pathname === item.route
-          : pathname.startsWith(item.route),
+        selected: item.matchRoutes
+          ? item.matchRoutes.some(
+              (route) =>
+                pathname === route || pathname.startsWith(`${route}/`),
+            )
+          : item.route === "/"
+            ? pathname === item.route
+            : pathname.startsWith(item.route),
       }))}
       onSelect={(e: BottomNavigationSelectEvent) =>
         router.push(e.itemTarget.route)

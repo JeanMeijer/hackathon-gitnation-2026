@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import SchedulePage from "./schedule-page";
+import HomeDashboard from "./home-dashboard";
 
 export default function OnboardingGate() {
   const router = useRouter();
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
 
-  // Gate on whether a profile exists in the DB.
+  // Gate on whether a profile exists in the mock API.
   useEffect(() => {
     let active = true;
     fetch("/api/profile")
@@ -33,5 +33,5 @@ export default function OnboardingGate() {
     return null;
   }
 
-  return <SchedulePage />;
+  return <HomeDashboard />;
 }

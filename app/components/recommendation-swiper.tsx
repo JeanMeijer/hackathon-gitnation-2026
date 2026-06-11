@@ -10,13 +10,14 @@ import {
 } from "react";
 import { Button } from "@progress/kendo-react-buttons";
 import {
-  Avatar,
   Card,
   CardBody,
   CardHeader,
   CardTitle,
 } from "@progress/kendo-react-layout";
 import { cancelIcon, usersIcon } from "@progress/kendo-svg-icons";
+import { saveSentInvite } from "../invites/invite-data";
+import ProfileAvatar from "./profile-avatar";
 import styles from "./recommendation-swiper.module.css";
 
 type Decision = "next" | "meet";
@@ -76,6 +77,42 @@ const profiles: Profile[] = [
     technologies: ["Accessibility", "React Native", "Testing", "UX Research"],
     match: 79,
   },
+  {
+    id: "kai",
+    name: "Kai Morgan",
+    technologies: ["Edge Runtime", "WebSockets", "Node.js", "Observability"],
+    match: 86,
+  },
+  {
+    id: "zoe",
+    name: "Zoe Ivers",
+    technologies: ["Design Systems", "Figma Plugins", "KendoReact", "Motion"],
+    match: 83,
+  },
+  {
+    id: "dante",
+    name: "Dante Ford",
+    technologies: ["APIs", "Auth", "Postgres", "Security"],
+    match: 81,
+  },
+  {
+    id: "mina",
+    name: "Mina Rao",
+    technologies: ["AI Agents", "RAG", "TypeScript", "Product Strategy"],
+    match: 89,
+  },
+  {
+    id: "oscar",
+    name: "Oscar Novak",
+    technologies: ["Testing", "Playwright", "CI", "Developer Experience"],
+    match: 77,
+  },
+  {
+    id: "imani",
+    name: "Imani Reed",
+    technologies: ["Accessibility", "Community Building", "React", "Mentoring"],
+    match: 85,
+  },
 ];
 
 const initialDrag: DragState = {
@@ -89,15 +126,6 @@ const initialDrag: DragState = {
 const swipeThreshold = 96;
 const ringRadius = 54;
 const ringCircumference = 2 * Math.PI * ringRadius;
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 export default function RecommendationSwiper() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -129,6 +157,15 @@ export default function RecommendationSwiper() {
     }
 
     const nextProfile = profiles[currentIndex + 1];
+
+    if (direction === "meet") {
+      saveSentInvite({
+        id: activeProfile.id,
+        interests: activeProfile.technologies,
+        match: activeProfile.match,
+        name: activeProfile.name,
+      });
+    }
 
     setExiting({ profileId: activeProfile.id, direction });
     setDrag(initialDrag);
@@ -356,15 +393,7 @@ export default function RecommendationSwiper() {
                           }
                         />
                       </svg>
-                      <Avatar
-                        className={styles.avatar}
-                        type="text"
-                        rounded="full"
-                        themeColor="primary"
-                        aria-hidden="true"
-                      >
-                        {getInitials(profile.name)}
-                      </Avatar>
+                      <ProfileAvatar name={profile.name} size="large" />
                       <span className={styles.matchText} aria-hidden="true">
                         {profile.match}% match
                       </span>

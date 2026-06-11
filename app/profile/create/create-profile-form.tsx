@@ -46,7 +46,7 @@ export default function CreateProfileForm({
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Load the catalog of selectable interests from the DB.
+  // Load the catalog of selectable interests from the mock API.
   useEffect(() => {
     fetch("/api/interests")
       .then((res) => (res.ok ? res.json() : []))
