@@ -6,6 +6,7 @@ export const env = createEnv({
    * Server-side environment variables. Never exposed to the client.
    */
   server: {
+    DATABASE_URL: z.url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -19,6 +20,7 @@ export const env = createEnv({
    * manually here for every key in the schemas above.
    */
   runtimeEnv: {
+    DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
