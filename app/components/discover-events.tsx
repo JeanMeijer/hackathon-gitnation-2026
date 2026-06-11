@@ -106,7 +106,7 @@ export default function DiscoverEvents() {
   }, [date]);
 
   return (
-    <div className="discover-events flex min-h-0 flex-1 flex-col">
+    <div className="discover-events flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div
         className="discover-events-filters flex flex-wrap gap-2 border-b border-black/10 px-4 py-3"
         role="group"
@@ -137,7 +137,6 @@ export default function DiscoverEvents() {
       <div
         ref={scheduleRef}
         className="discover-events-schedule-shell min-h-0 flex-1 overflow-hidden"
-        style={{ height: "calc(100dvh - 11.5rem)", minHeight: 480 }}
       >
         <Scheduler
           className="my-schedule my-schedule-embedded discover-events-scheduler"
@@ -146,8 +145,8 @@ export default function DiscoverEvents() {
           data={data}
           defaultView="day"
           editable={false}
-          footer={() => null}
-          header={ScheduleDateNavHeader}
+          footer={ScheduleDateNavHeader}
+          header={() => null}
           item={itemComponent}
           resources={[EVENT_TYPE_RESOURCE]}
           onDateChange={handleDateChange}

@@ -7,9 +7,9 @@ import {
   ButtonGroup,
 } from "@progress/kendo-react-buttons";
 import {
-  SchedulerHeader,
+  SchedulerFooter,
   useSchedulerDateContext,
-  type SchedulerHeaderProps,
+  type SchedulerFooterProps,
 } from "@progress/kendo-react-scheduler";
 import { chevronLeftIcon, chevronRightIcon } from "@progress/kendo-svg-icons";
 import {
@@ -37,7 +37,7 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
-export default function ScheduleDateNavHeader(props: SchedulerHeaderProps) {
+export default function ScheduleDateNavHeader(props: SchedulerFooterProps) {
   const [date, setDate] = useSchedulerDateContext();
   const viewingToday = isViewingToday(date);
 
@@ -92,7 +92,7 @@ export default function ScheduleDateNavHeader(props: SchedulerHeaderProps) {
   );
 
   return (
-    <SchedulerHeader {...props}>
+    <SchedulerFooter {...props}>
       <div className="schedule-date-nav">
         <ButtonGroup className="k-scheduler-navigation schedule-date-nav-group">
           <Button
@@ -127,6 +127,6 @@ export default function ScheduleDateNavHeader(props: SchedulerHeaderProps) {
           />
         </ButtonGroup>
       </div>
-    </SchedulerHeader>
+    </SchedulerFooter>
   );
 }

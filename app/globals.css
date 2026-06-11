@@ -31,10 +31,32 @@ body {
 
 .my-schedule {
   --kendo-scheduler-height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.my-schedule .k-scheduler-toolbar {
+.my-schedule .k-scheduler-layout.k-scheduler-layout-flex {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.my-schedule .k-scheduler-content {
+  overflow-x: hidden;
+}
+
+.my-schedule .k-scheduler-footer {
   justify-content: center;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .my-schedule .k-scheduler-head {
@@ -45,6 +67,8 @@ body {
   display: flex;
   justify-content: center;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .schedule-date-nav-group {
@@ -76,16 +100,23 @@ body {
 
 .my-schedule-embed {
   background: #fbfcfa;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-.my-schedule-embedded .k-scheduler-toolbar,
-.my-schedule-embedded .k-scheduler-header,
+.my-schedule-embed > .my-schedule,
+.discover-events-schedule-shell > .my-schedule {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.my-schedule-embedded .k-scheduler-footer,
 .my-schedule-embedded .k-scheduler-layout td {
   border-color: rgba(23, 32, 28, 0.1);
 }
 
-.my-schedule-embedded .k-scheduler-toolbar,
-.my-schedule-embedded .k-scheduler-header {
+.my-schedule-embedded .k-scheduler-footer {
   background: #fbfcfa;
 }
 
@@ -479,7 +510,9 @@ body {
 }
 
 .discover-shell {
-  min-height: calc(100dvh - 4rem);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .discover-tabstrip.k-tabstrip {
@@ -540,6 +573,12 @@ body {
 
 .discover-events-schedule-shell {
   background: #fbfcfa;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .schedule-event-badges {

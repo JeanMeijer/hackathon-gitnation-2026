@@ -186,14 +186,10 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
         ref={scheduleRef}
         className={
           embedded
-            ? "my-schedule-embed overflow-hidden"
+            ? "my-schedule-embed flex min-h-0 flex-1 flex-col overflow-hidden"
             : "min-h-0 flex-1 overflow-hidden"
         }
-        style={
-          embedded
-            ? { height: "100%", minHeight: 0 }
-            : { height: "calc(100dvh - 7.5rem)", minHeight: 520 }
-        }
+        style={embedded ? undefined : { height: "calc(100dvh - 7.5rem)", minHeight: 520 }}
       >
         <Scheduler
           className={embedded ? "my-schedule my-schedule-embedded" : "my-schedule"}
@@ -202,8 +198,8 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
           data={data}
           defaultView="day"
           editable={false}
-          footer={() => null}
-          header={ScheduleDateNavHeader}
+          footer={ScheduleDateNavHeader}
+          header={() => null}
           item={itemComponent}
           resources={[EVENT_TYPE_RESOURCE]}
           onDateChange={handleDateChange}
