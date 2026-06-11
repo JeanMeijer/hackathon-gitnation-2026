@@ -1,9 +1,13 @@
+export type InterestType = "tech" | "non_tech";
+
 export type UserProfile = {
   name: string;
   company: string;
   descriptions: string;
   title: string;
   interests: string[];
+  /** Maps interest name → its type, used for tech/non-tech highlighting. */
+  interestTypes?: Record<string, InterestType>;
 };
 
 export const profileStorageKey = "gitnation-user-profile";

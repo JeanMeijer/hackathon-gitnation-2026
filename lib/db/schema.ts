@@ -13,10 +13,14 @@ export const interestTypeEnum = pgEnum("interest_type", ["tech", "non_tech"]);
 export const profiles = pgTable("profiles", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: text().notNull(),
+  title: text(),
+  company: text(),
+  description: text(),
 });
 
 export const interests = pgTable("interests", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: text().notNull(),
   type: interestTypeEnum().notNull(),
 });
 
