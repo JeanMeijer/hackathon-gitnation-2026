@@ -25,16 +25,29 @@ import {
   getActivityTypeLabel,
   type PredefinedActivity,
 } from "@/lib/schedule/activities";
+import {
+  formatOverlapWarning,
+  getOverlappingEvents,
+} from "@/lib/schedule/overlap";
+import {
+  filterEventsOnDay,
+  isStartWithinShadowWindow,
+} from "@/lib/schedule/shadow-events";
 import type { ScheduleEvent, ScheduleEventType } from "@/lib/schedule/types";
 
 export interface ActivityPickerDraft {
   start: Date;
   end: Date;
+  shadowWindow?: {
+    start: Date;
+    end: Date;
+  };
 }
 
 interface ActivityPickerDialogProps {
   open: boolean;
   draft: ActivityPickerDraft | null;
+  existingEvents: ScheduleEvent[];
   onClose: () => void;
   onConfirm: (event: ScheduleEvent) => void;
 }
@@ -100,9 +113,20 @@ function getDurationMinutes(start: Date | null, end: Date | null) {
   return Math.max(15, Math.round((end.getTime() - start.getTime()) / 60000));
 }
 
+function getActivitiesForPicker(
+  type: ScheduleEventType,
+  shadowMode: boolean,
+  slotDurationMinutes: number,
+) {
+  return shadowMode
+    ? getActivitiesByType(type)
+    : getActivitiesByType(type, slotDurationMinutes);
+}
+
 export default function ActivityPickerDialog({
   open,
   draft,
+  existingEvents,
   onClose,
   onConfirm,
 }: ActivityPickerDialogProps) {
@@ -113,23 +137,44 @@ export default function ActivityPickerDialog({
   const [end, setEnd] = useState<Date | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
 
+  const shadowWindow = draft?.shadowWindow ?? null;
+  const shadowMode = shadowWindow != null;
   const slotDurationMinutes = getDurationMinutes(start, end);
+  const startWithinShadow =
+    !shadowWindow || !start
+      ? true
+      : isStartWithinShadowWindow(start, shadowWindow);
 
-  const availableTypes = useMemo(
-    () =>
-      EVENT_TYPE_ORDER.filter(
-        (type) => getActivitiesByType(type, slotDurationMinutes).length > 0
-      ),
-    [slotDurationMinutes]
-  );
+  const dayEvents = useMemo(() => {
+    if (!start) {
+      return existingEvents;
+    }
 
-  const filteredActivities = useMemo(
-    () =>
-      selectedType
-        ? getActivitiesByType(selectedType, slotDurationMinutes)
-        : [],
-    [selectedType, slotDurationMinutes]
-  );
+    return filterEventsOnDay(existingEvents, start);
+  }, [existingEvents, start]);
+
+  const availableTypes = useMemo(() => {
+    if (shadowMode && !startWithinShadow) {
+      return [];
+    }
+
+    return EVENT_TYPE_ORDER.filter(
+      (type) =>
+        getActivitiesForPicker(type, shadowMode, slotDurationMinutes).length > 0
+    );
+  }, [shadowMode, slotDurationMinutes, startWithinShadow]);
+
+  const filteredActivities = useMemo(() => {
+    if (!selectedType || (shadowMode && !startWithinShadow)) {
+      return [];
+    }
+
+    return getActivitiesForPicker(
+      selectedType,
+      shadowMode,
+      slotDurationMinutes
+    );
+  }, [selectedType, shadowMode, slotDurationMinutes, startWithinShadow]);
 
   useEffect(() => {
     if (!open || !draft) {
@@ -175,6 +220,16 @@ export default function ActivityPickerDialog({
     }
   };
 
+  const getOverlapWarning = (activity: PredefinedActivity) => {
+    if (!start) {
+      return null;
+    }
+
+    const activityEnd = addMinutes(start, activity.durationMinutes);
+    const overlaps = getOverlappingEvents(dayEvents, start, activityEnd);
+    return formatOverlapWarning(overlaps);
+  };
+
   const dialogTitle = "Add activity";
 
   const handleTypeSelect = (type: ScheduleEventType) => {
@@ -184,6 +239,18 @@ export default function ActivityPickerDialog({
   const handleBackToTypes = () => {
     setSelectedType(null);
   };
+
+  const emptyActivitiesMessage = shadowMode
+    ? startWithinShadow
+      ? "No activities available."
+      : "Move the start time back into the selected gap to see activities."
+    : "No activities fit in the selected time slot.";
+
+  const emptyTypesMessage = shadowMode
+    ? startWithinShadow
+      ? "No activities available."
+      : "Move the start time back into the selected gap to see activities."
+    : "No activities fit in the selected time slot. Adjust the time below to see more options.";
 
   if (!open || !draft) {
     return null;
@@ -221,37 +288,46 @@ export default function ActivityPickerDialog({
               >
                 {filteredActivities.length > 0 ? (
                   <div className="flex flex-col gap-2">
-                    {filteredActivities.map((activity) => (
-                      <Card
-                        key={activity.id}
-                        role="listitem"
-                        className="activity-picker-card"
-                      >
-                        <CardBody className="activity-picker-card-body !py-3">
-                          <div className="activity-picker-card-copy">
-                            <CardTitle className="!text-sm !font-medium">
-                              {activity.title}
-                            </CardTitle>
-                            <CardSubtitle className="!text-xs">
-                              {getActivitySubtitle(activity)}
-                            </CardSubtitle>
-                          </div>
-                          <Button
-                            type="button"
-                            size="small"
-                            themeColor="primary"
-                            className="activity-picker-card-add"
-                            onClick={() => handleAddActivity(activity)}
-                          >
-                            Add
-                          </Button>
-                        </CardBody>
-                      </Card>
-                    ))}
+                    {filteredActivities.map((activity) => {
+                      const overlapWarning = getOverlapWarning(activity);
+
+                      return (
+                        <Card
+                          key={activity.id}
+                          role="listitem"
+                          className="activity-picker-card"
+                        >
+                          <CardBody className="activity-picker-card-body !py-3">
+                            <div className="activity-picker-card-copy">
+                              <CardTitle className="!text-sm !font-medium">
+                                {activity.title}
+                              </CardTitle>
+                              <CardSubtitle className="!text-xs">
+                                {getActivitySubtitle(activity)}
+                              </CardSubtitle>
+                              {overlapWarning ? (
+                                <p className="activity-picker-overlap-warning">
+                                  {overlapWarning}
+                                </p>
+                              ) : null}
+                            </div>
+                            <Button
+                              type="button"
+                              size="small"
+                              themeColor="primary"
+                              className="activity-picker-card-add"
+                              onClick={() => handleAddActivity(activity)}
+                            >
+                              Add
+                            </Button>
+                          </CardBody>
+                        </Card>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="px-1 py-6 text-center text-sm text-black/55">
-                    No activities fit in the selected time slot.
+                    {emptyActivitiesMessage}
                   </p>
                 )}
               </div>
@@ -263,8 +339,11 @@ export default function ActivityPickerDialog({
               aria-label="Activity categories"
             >
               {availableTypes.map((type) => {
-                const count = getActivitiesByType(type, slotDurationMinutes)
-                  .length;
+                const count = getActivitiesForPicker(
+                  type,
+                  shadowMode,
+                  slotDurationMinutes
+                ).length;
 
                 return (
                   <button
@@ -292,8 +371,7 @@ export default function ActivityPickerDialog({
               })}
               {availableTypes.length === 0 ? (
                 <p className="col-span-2 px-1 py-6 text-center text-sm text-black/55">
-                  No activities fit in the selected time slot. Adjust the time
-                  below to see more options.
+                  {emptyTypesMessage}
                 </p>
               ) : null}
             </div>

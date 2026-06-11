@@ -23,7 +23,7 @@ import {
   MAP_ZOOM,
   VENUE_DESTINATION,
   VENUE_ENTRANCE,
-  VENUE_ROUTE_WAYPOINT,
+  VENUE_ROUTE_WAYPOINTS,
 } from "@/lib/map/venue-location";
 
 interface EventMapDialogProps {
@@ -82,10 +82,13 @@ function drawRoute(map: ResetEvent["target"]) {
     return;
   }
 
-  const from = map.locationToView(VENUE_ENTRANCE);
-  const waypoint = map.locationToView(VENUE_ROUTE_WAYPOINT);
-  const to = map.locationToView(VENUE_DESTINATION);
-  if (!from || !waypoint || !to) {
+  const vertices = [
+    VENUE_ENTRANCE,
+    ...VENUE_ROUTE_WAYPOINTS,
+    VENUE_DESTINATION,
+  ];
+  const views = vertices.map((vertex) => map.locationToView(vertex));
+  if (views.some((view) => !view)) {
     return;
   }
 
@@ -97,7 +100,10 @@ function drawRoute(map: ResetEvent["target"]) {
     },
   });
 
-  line.moveTo(from).lineTo(waypoint).lineTo(to);
+  line.moveTo(views[0]!);
+  for (let i = 1; i < views.length; i++) {
+    line.lineTo(views[i]!);
+  }
   shapeLayer.surface.draw(line);
 }
 

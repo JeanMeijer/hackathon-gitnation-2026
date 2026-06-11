@@ -7,12 +7,13 @@ export const VENUE_ENTRANCE: [number, number] = [
 
 /** Inside the venue — placeholder offset from entrance. */
 export const VENUE_DESTINATION: [number, number] = [
-  52.38274876988606, 4.920704022979693,
+  52.38263065638761, 4.920482981715665,
 ];
 
-/** Waypoint along the route between start and destination. */
-export const VENUE_ROUTE_WAYPOINT: [number, number] = [
-  52.38206579974548, 4.920905429635512,
+/** Waypoints along the route between start and destination. */
+export const VENUE_ROUTE_WAYPOINTS: [number, number][] = [
+  [52.38206579974548, 4.920905429635512],
+  [52.382656467561915, 4.920732280470759],
 ];
 
 export const MAP_CENTER: [number, number] = [

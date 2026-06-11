@@ -70,14 +70,6 @@ body {
   filter: brightness(1.05);
 }
 
-.my-schedule .schedule-slot-empty {
-  cursor: pointer;
-}
-
-.my-schedule .schedule-slot-empty:hover {
-  background-color: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 8%, transparent);
-}
-
 .my-schedule-embed {
   background: #fbfcfa;
 }
@@ -95,7 +87,7 @@ body {
 
 .my-schedule-embedded .k-event {
   border-radius: 8px;
-  border: 1px solid rgba(23, 32, 28, 0.12);
+  border: 3px solid rgba(23, 32, 28, 0.12);
   background: #fff !important;
   box-shadow: 0 4px 12px rgba(23, 32, 28, 0.06);
   color: #17201c;
@@ -176,8 +168,70 @@ body {
   color: #7630bc;
 }
 
-.my-schedule-embedded .schedule-slot-empty:hover {
-  background-color: rgba(14, 165, 233, 0.08);
+.my-schedule-embedded .k-event.schedule-event-shadow,
+.my-schedule .k-event.schedule-event-shadow {
+  border: none;
+  background: transparent !important;
+  box-shadow: none;
+  color: var(--kendo-color-primary, #1274ac);
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.my-schedule-embedded .k-event.schedule-event-shadow .k-event-template,
+.my-schedule .k-event.schedule-event-shadow .k-event-template {
+  height: 100%;
+}
+
+.my-schedule-embedded .k-event.schedule-shadow-clickable:hover,
+.my-schedule .k-event.schedule-shadow-clickable:hover {
+  background: transparent !important;
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+
+.my-schedule-embedded .k-event.schedule-shadow-clickable:hover .schedule-shadow-event,
+.my-schedule .k-event.schedule-shadow-clickable:hover .schedule-shadow-event {
+  background: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 10%, transparent);
+}
+
+.schedule-shadow-event {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  height: 100%;
+  min-height: 3rem;
+  padding: 0.5rem;
+  border: 2px dashed color-mix(in srgb, var(--kendo-color-primary, #1274ac) 35%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 4%, transparent);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.schedule-shadow-event-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--kendo-color-primary, #1274ac);
+}
+
+.schedule-shadow-event-label {
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.2;
+  color: var(--kendo-color-primary, #1274ac);
+}
+
+.activity-picker-overlap-warning {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #b45309;
 }
 
 .activity-picker-type-grid {

@@ -1,13 +1,19 @@
 "use client";
 
+import { SvgIcon } from "@progress/kendo-react-common";
 import {
   SchedulerItem,
   type SchedulerItemProps,
 } from "@progress/kendo-react-scheduler";
+import { plusIcon } from "@progress/kendo-svg-icons";
 import {
   formatEventStartTime,
   getEventLocationLabel,
 } from "@/lib/schedule/event-lookup";
+import {
+  isShadowScheduleEvent,
+  SHADOW_EVENT_TITLE,
+} from "@/lib/schedule/shadow-events";
 import type { ScheduleEvent, ScheduleEventType } from "@/lib/schedule/types";
 
 function isPastEvent(end: Date, now: number = Date.now()): boolean {
@@ -61,29 +67,46 @@ function EmbeddedScheduleEventContent({
   );
 }
 
+function ShadowScheduleEventContent() {
+  return (
+    <div className="schedule-shadow-event">
+      <SvgIcon icon={plusIcon} className="schedule-shadow-event-icon" />
+      <span className="schedule-shadow-event-label">add activity</span>
+    </div>
+  );
+}
+
 interface CreateScheduleItemOptions {
   variant?: "page" | "embedded";
 }
 
 export function createScheduleItem(
   onEventClick: (eventId: string) => void,
+  onShadowClick: (shadow: { start: Date; end: Date }) => void,
   options: CreateScheduleItemOptions = {},
 ) {
   const embedded = options.variant === "embedded";
 
   return function ScheduleItem(props: SchedulerItemProps) {
-    const past = isPastEvent(props.end);
+    const shadow = isShadowScheduleEvent(props.dataItem);
+    const past = !shadow && isPastEvent(props.end);
     const className = [
       props.className,
+      shadow ? "schedule-event-shadow" : undefined,
       past ? "k-event-past" : undefined,
-      "schedule-event-clickable",
-      embedded ? "schedule-event-embedded" : undefined,
+      shadow ? "schedule-shadow-clickable" : "schedule-event-clickable",
+      embedded && !shadow ? "schedule-event-embedded" : undefined,
     ]
       .filter(Boolean)
       .join(" ");
 
     const handleClick: SchedulerItemProps["onClick"] = (event) => {
       props.onClick?.(event);
+
+      if (shadow) {
+        onShadowClick({ start: props.start, end: props.end });
+        return;
+      }
 
       const eventId = props.dataItem?.id;
       if (eventId != null) {
@@ -97,6 +120,7 @@ export function createScheduleItem(
     return (
       <SchedulerItem
         {...props}
+        title={shadow ? SHADOW_EVENT_TITLE : props.title}
         className={className}
         style={
           past
@@ -108,7 +132,9 @@ export function createScheduleItem(
         }
         onClick={handleClick}
       >
-        {embedded && scheduleEvent ? (
+        {shadow ? (
+          <ShadowScheduleEventContent />
+        ) : embedded && scheduleEvent ? (
           <EmbeddedScheduleEventContent
             event={scheduleEvent}
             start={props.start}

@@ -20,7 +20,6 @@ import ActivityPickerDialog, {
 import ScheduleDateNavHeader from "@/app/components/schedule-date-nav-header";
 import ScheduleHeader from "@/app/components/schedule-header";
 import { createScheduleItem } from "@/app/components/schedule-item";
-import { createScheduleSlot } from "@/app/components/schedule-slot";
 import {
   clampToConferenceRange,
   CONFERENCE_DATE_RANGE,
@@ -47,6 +46,7 @@ import {
   isViewingToday,
   scrollToCurrentTimeMarkerWhenReady,
 } from "@/lib/schedule/scroll-to-current-time";
+import { computeShadowEvents } from "@/lib/schedule/shadow-events";
 import type { ScheduleEvent } from "@/lib/schedule/types";
 
 const emptyBookedMeetings: BookedMeeting[] = [];
@@ -93,12 +93,25 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
   const [pickerDraft, setPickerDraft] = useState<ActivityPickerDraft | null>(
     null
   );
-  const data = useMemo(
+
+  const realEvents = useMemo(
     () =>
       [...baseEvents, ...bookedMeetings, ...customEvents].sort(
         (a, b) => a.start.getTime() - b.start.getTime()
       ),
     [baseEvents, bookedMeetings, customEvents]
+  );
+
+  const shadowEvents = useMemo(
+    () => computeShadowEvents(realEvents, date),
+    [realEvents, date]
+  );
+
+  const data = useMemo(
+    () => [...realEvents, ...shadowEvents].sort(
+      (a, b) => a.start.getTime() - b.start.getTime()
+    ),
+    [realEvents, shadowEvents]
   );
 
   const openPicker = useCallback((draft: ActivityPickerDraft) => {
@@ -114,9 +127,16 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
     });
   }, [date, openPicker]);
 
-  const handleEmptySlotClick = useCallback(
-    (slot: { start: Date; end: Date }) => {
-      openPicker(slot);
+  const handleShadowClick = useCallback(
+    (shadow: { start: Date; end: Date }) => {
+      openPicker({
+        start: new Date(shadow.start),
+        end: new Date(shadow.end),
+        shadowWindow: {
+          start: new Date(shadow.start),
+          end: new Date(shadow.end),
+        },
+      });
     },
     [openPicker]
   );
@@ -138,13 +158,8 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
   );
 
   const itemComponent = useMemo(
-    () => createScheduleItem(handleEventClick, { variant }),
-    [handleEventClick, variant],
-  );
-
-  const slotComponent = useMemo(
-    () => createScheduleSlot(handleEmptySlotClick),
-    [handleEmptySlotClick]
+    () => createScheduleItem(handleEventClick, handleShadowClick, { variant }),
+    [handleEventClick, handleShadowClick, variant],
   );
 
   const handleDateChange = (event: SchedulerDateChangeEvent) => {
@@ -190,13 +205,14 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
           footer={() => null}
           header={ScheduleDateNavHeader}
           item={itemComponent}
-          slot={slotComponent}
           resources={[EVENT_TYPE_RESOURCE]}
           onDateChange={handleDateChange}
         >
           <DayView
             startTime="08:00"
             endTime="20:00"
+            slotDuration={60}
+            slotDivisions={2}
             showWorkHours={false}
             currentTimeMarker={true}
           />
@@ -206,6 +222,7 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
       <ActivityPickerDialog
         open={pickerOpen}
         draft={pickerDraft}
+        existingEvents={realEvents}
         onClose={handleClosePicker}
         onConfirm={handleConfirmActivity}
       />
