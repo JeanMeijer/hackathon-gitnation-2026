@@ -1,0 +1,198 @@
+.shell {
+  min-height: calc(100vh - 4rem);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 18px 40px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 233, 0.1), transparent 42%),
+    linear-gradient(315deg, rgba(25, 169, 116, 0.1), transparent 42%),
+    #f7f7f2;
+}
+
+.card {
+  width: min(100%, 620px);
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 22px 54px rgba(23, 32, 28, 0.14);
+}
+
+.content {
+  display: grid;
+  gap: 24px;
+  padding: clamp(24px, 5vw, 42px);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.avatar {
+  width: 84px;
+  height: 84px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  box-shadow: 0 14px 28px rgba(14, 165, 233, 0.16);
+}
+
+.headerText {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.name {
+  margin: 0;
+  color: #17201c;
+  font-size: clamp(1.7rem, 4vw, 2.25rem);
+  font-weight: 780;
+  line-height: 1.08;
+}
+
+.title {
+  margin: 0;
+  color: #46504a;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.company {
+  width: fit-content;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eff7ff;
+  color: #075985;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.description {
+  margin: 0;
+  color: #3d4741;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.interests {
+  display: grid;
+  gap: 12px;
+}
+
+.interestsTitle {
+  margin: 0;
+  color: #17201c;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  font-weight: 700;
+}
+
+.formCard {
+  width: min(100%, 720px);
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 22px 54px rgba(23, 32, 28, 0.14);
+}
+
+.formHeader {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+
+.formTitle {
+  margin: 0;
+  color: #17201c;
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  font-weight: 780;
+  line-height: 1.1;
+}
+
+.formSummary {
+  margin: 0;
+  color: #5d665f;
+  line-height: 1.5;
+}
+
+.form {
+  display: grid;
+  gap: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.errorText {
+  margin: 0;
+  color: #b4233a;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 6px;
+}
+
+@media (max-width: 520px) {
+  .shell {
+    align-items: start;
+    padding: 20px 14px 32px;
+  }
+
+  .toolbar,
+  .formActions {
+    justify-content: stretch;
+  }
+
+  .toolbar button,
+  .formActions button {
+    flex: 1;
+  }
+
+  .identity {
+    align-items: flex-start;
+  }
+
+  .avatar {
+    width: 68px;
+    height: 68px;
+    font-size: 1.35rem;
+  }
+
+  .twoColumn {
+    grid-template-columns: 1fr;
+  }
+}
