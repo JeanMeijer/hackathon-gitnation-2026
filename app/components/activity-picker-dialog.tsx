@@ -78,6 +78,18 @@ function mergeTime(date: Date, time: Date): Date {
   return merged;
 }
 
+function addMinutes(date: Date, minutes: number): Date {
+  return new Date(date.getTime() + minutes * 60 * 1000);
+}
+
+function getDurationMinutes(start: Date | null, end: Date | null) {
+  if (!start || !end || end.getTime() <= start.getTime()) {
+    return 30;
+  }
+
+  return Math.max(15, Math.round((end.getTime() - start.getTime()) / 60000));
+}
+
 export default function ActivityPickerDialog({
   open,
   draft,
@@ -115,10 +127,14 @@ export default function ActivityPickerDialog({
       return;
     }
 
-    setSelectedActivity(null);
-    setStart(new Date(draft.start));
-    setEnd(new Date(draft.end));
-    setEditingField(null);
+    const frame = window.requestAnimationFrame(() => {
+      setSelectedActivity(null);
+      setStart(new Date(draft.start));
+      setEnd(new Date(draft.end));
+      setEditingField(null);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, [open, draft]);
 
   const canConfirm =
@@ -131,9 +147,22 @@ export default function ActivityPickerDialog({
     setEditingField((current) => (current === field ? null : field));
   };
 
+  const handleActivitySelect = (activity: PredefinedActivity) => {
+    setSelectedActivity(activity);
+
+    if (start) {
+      setEnd(addMinutes(start, activity.durationMinutes));
+    }
+  };
+
   const handleTimeChange = (field: Exclude<EditingField, null>, time: Date) => {
     if (field === "start" && start) {
-      setStart(mergeTime(start, time));
+      const nextStart = mergeTime(start, time);
+      const durationMinutes =
+        selectedActivity?.durationMinutes ?? getDurationMinutes(start, end);
+
+      setStart(nextStart);
+      setEnd(addMinutes(nextStart, durationMinutes));
       return;
     }
 
@@ -196,11 +225,11 @@ export default function ActivityPickerDialog({
                               }
                             : undefined
                         }
-                        onClick={() => setSelectedActivity(activity)}
+                        onClick={() => handleActivitySelect(activity)}
                         onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
                           if (event.key === "Enter" || event.key === " ") {
                             event.preventDefault();
-                            setSelectedActivity(activity);
+                            handleActivitySelect(activity);
                           }
                         }}
                       >

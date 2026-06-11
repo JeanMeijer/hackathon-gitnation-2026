@@ -1,0 +1,211 @@
+.shell {
+  min-height: calc(100vh - 4rem);
+  width: 100%;
+  padding: 28px 18px 40px;
+  background:
+    linear-gradient(135deg, rgba(14, 165, 233, 0.1), transparent 42%),
+    linear-gradient(315deg, rgba(25, 169, 116, 0.1), transparent 42%),
+    #f7f7f2;
+}
+
+.wrap {
+  width: min(100%, 1000px);
+  display: grid;
+  gap: 22px;
+  margin: 0 auto;
+}
+
+.header {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  color: #17201c;
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  font-weight: 780;
+  line-height: 1.1;
+}
+
+.summary {
+  margin: 0;
+  color: #5d665f;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.panel {
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 42px rgba(23, 32, 28, 0.12);
+}
+
+.panelBody {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+}
+
+.panelTitle {
+  margin: 0;
+  color: #17201c;
+  font-size: 1.15rem;
+  font-weight: 780;
+}
+
+.inviteList {
+  display: grid;
+  gap: 12px;
+}
+
+.inviteCard {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(23, 32, 28, 0.1);
+  border-radius: 8px;
+  background: #fbfcfa;
+}
+
+.inviteTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inviteIdentity {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.inviteName {
+  margin: 0;
+  color: #17201c;
+  font-weight: 800;
+}
+
+.inviteMeta {
+  margin: 0;
+  color: #5d665f;
+  font-size: 0.9rem;
+}
+
+.status {
+  width: fit-content;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eff7ff;
+  color: #075985;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.bookedStatus {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font-weight: 700;
+}
+
+.bookingSummary {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border: 1px solid rgba(25, 169, 116, 0.22);
+  border-radius: 8px;
+  background: #f3fbf7;
+}
+
+.bookingTitle {
+  margin: 0;
+  color: #116946;
+  font-weight: 800;
+}
+
+.inviteActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bookingForm {
+  display: grid;
+  gap: 14px;
+}
+
+.dialogSummary {
+  margin: 0;
+  color: #5d665f;
+  line-height: 1.45;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.dateTimeInput {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid rgba(23, 32, 28, 0.18);
+  border-radius: 6px;
+  background: #ffffff;
+  color: #17201c;
+  font: inherit;
+}
+
+.dateTimeInput:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.16);
+  outline: none;
+}
+
+.errorText {
+  margin: 0;
+  color: #b4233a;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed rgba(23, 32, 28, 0.18);
+  border-radius: 8px;
+  color: #5d665f;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .shell {
+    padding: 20px 14px 32px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inviteActions {
+    display: grid;
+  }
+}

@@ -1,30 +1,5 @@
-import { db } from "@/lib/db";
-import { talks } from "@/lib/db/schema";
-import { asc } from "drizzle-orm";
+import { MOCK_USER_SCHEDULE } from "@/lib/schedule/mock-events";
 
 export async function GET() {
-  const tracksWithTalks = await db.query.tracks.findMany({
-    with: {
-      talks: {
-        orderBy: [asc(talks.startsAt)],
-        with: {
-          speakers: {
-            with: {
-              speaker: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const schedule = tracksWithTalks.map((track) => ({
-    ...track,
-    talks: track.talks.map((talk) => ({
-      ...talk,
-      speakers: talk.speakers.map((ts) => ts.speaker),
-    })),
-  }));
-
-  return Response.json(schedule);
+  return Response.json(MOCK_USER_SCHEDULE);
 }

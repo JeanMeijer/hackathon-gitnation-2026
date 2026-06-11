@@ -7,7 +7,13 @@ import {
   BottomNavigationSelectEvent,
 } from "@progress/kendo-react-layout";
 import type { SVGIcon } from "@progress/kendo-svg-icons";
-import { calendarIcon, heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
+import {
+  calendarIcon,
+  envelopeIcon,
+  heartIcon,
+  homeIcon,
+  userIcon,
+} from "@progress/kendo-svg-icons";
 
 interface NavItem {
   text: string;
@@ -25,6 +31,7 @@ const items: NavItem[] = [
     route: "/schedule",
     matchRoutes: ["/schedule"],
   },
+  { text: "Invites", svgIcon: envelopeIcon, route: "/invites" },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
 
@@ -33,7 +40,7 @@ export function BottomNav() {
   const router = useRouter();
   const [hasProfile, setHasProfile] = useState(false);
 
-  // Show navigation only once a profile exists in the DB.
+  // Show navigation only once a profile exists in the mock API.
   useEffect(() => {
     let active = true;
     fetch("/api/profile")
