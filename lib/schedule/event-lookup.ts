@@ -1,3 +1,4 @@
+import { DEFAULT_VENUE_ADDRESS } from "@/lib/map/venue-location";
 import { MOCK_EVENT_DETAILS } from "./mock-event-details";
 import { MOCK_USER_SCHEDULE } from "./mock-events";
 import { EVENT_TYPE_RESOURCE } from "./resources";
@@ -64,6 +65,11 @@ export function formatEventTimeRange(start: Date, end: Date): string {
 
 export function formatEventStartTime(start: Date): string {
   return new Intl.DateTimeFormat(undefined, TIME_FORMAT).format(start);
+}
+
+export function getEventLocationDisplay(event: ScheduleEvent): string {
+  const location = "location" in event ? event.location : undefined;
+  return location ?? DEFAULT_VENUE_ADDRESS;
 }
 
 export function getEventLocationLabel(event: ScheduleEvent): string | undefined {

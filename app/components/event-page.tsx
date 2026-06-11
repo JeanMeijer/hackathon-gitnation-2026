@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
 import { Button, Chip } from "@progress/kendo-react-buttons";
 import { Card, CardBody, CardSubtitle, CardTitle } from "@progress/kendo-react-layout";
 import { chevronLeftIcon } from "@progress/kendo-svg-icons";
+import EventMapDialog from "@/app/components/event-map-dialog";
 import {
   defaultUserProfile,
   getProfileSnapshot,
@@ -14,6 +16,7 @@ import {
   formatEventDate,
   formatEventTimeRange,
   getEventDescription,
+  getEventLocationDisplay,
   getEventLobbyAttendeeNames,
   getEventTypeLabel,
   getMockEventById,
@@ -35,7 +38,35 @@ function EventMetaRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function EventDetails({ event }: { event: ScheduleEvent }) {
+function EventLocationRow({
+  location,
+  onViewMap,
+}: {
+  location: string;
+  onViewMap: () => void;
+}) {
+  return (
+    <div className="grid gap-0.5">
+      <dt className="text-xs font-medium uppercase tracking-wide text-black/45">
+        Location
+      </dt>
+      <dd className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-black/80">
+        <span>{location}</span>
+        <Button fillMode="flat" themeColor="primary" size="small" onClick={onViewMap}>
+          View on map
+        </Button>
+      </dd>
+    </div>
+  );
+}
+
+function EventDetails({
+  event,
+  onViewMap,
+}: {
+  event: ScheduleEvent;
+  onViewMap: () => void;
+}) {
   const description = getEventDescription(event);
 
   return (
@@ -60,12 +91,10 @@ function EventDetails({ event }: { event: ScheduleEvent }) {
             <EventMetaRow label="Track" value={event.trackName} />
           ) : null}
 
-          {(event.type === "meeting" ||
-            event.type === "custom" ||
-            event.type === "break") &&
-          event.location ? (
-            <EventMetaRow label="Location" value={event.location} />
-          ) : null}
+          <EventLocationRow
+            location={getEventLocationDisplay(event)}
+            onViewMap={onViewMap}
+          />
         </dl>
 
         {description ? (
@@ -161,6 +190,7 @@ function EventNotFound() {
 
 export default function EventPage({ eventId }: EventPageProps) {
   const router = useRouter();
+  const [mapOpen, setMapOpen] = useState(false);
   const event = getMockEventById(eventId);
   const profile = useSyncExternalStore(
     subscribeToProfile,
@@ -188,11 +218,17 @@ export default function EventPage({ eventId }: EventPageProps) {
       <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto px-4 py-5">
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-semibold leading-tight">{event.title}</h1>
-          <EventDetails event={event} />
+          <EventDetails event={event} onViewMap={() => setMapOpen(true)} />
         </div>
 
         <EventLobby event={event} currentUserName={profile.name} />
       </div>
+
+      <EventMapDialog
+        open={mapOpen}
+        onClose={() => setMapOpen(false)}
+        title={event.title}
+      />
     </main>
   );
 }
