@@ -28,3 +28,48 @@ body {
 .my-schedule {
   --kendo-scheduler-height: 100%;
 }
+
+.my-schedule .k-event.k-event-past {
+  filter: grayscale(0.4);
+}
+
+.my-schedule .k-event.k-event-past .k-event-title {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, currentColor 60%, transparent);
+}
+
+.my-schedule .schedule-slot-empty {
+  cursor: pointer;
+}
+
+.my-schedule .schedule-slot-empty:hover {
+  background-color: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 8%, transparent);
+}
+
+.activity-picker-list {
+  scrollbar-gutter: stable;
+}
+
+.activity-picker-card {
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.activity-picker-card:focus-visible {
+  outline: 2px solid var(--kendo-color-primary, #1274ac);
+  outline-offset: 2px;
+}
+
+.activity-picker-card-selected {
+  background-color: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 6%, transparent);
+}
+
+.activity-time-editor {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.25rem;
+}
+
+.activity-time-editor .k-time-selector {
+  width: 100%;
+  max-width: 16rem;
+}

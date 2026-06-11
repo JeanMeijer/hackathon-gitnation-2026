@@ -6,13 +6,26 @@ import {
   BottomNavigation,
   BottomNavigationSelectEvent,
 } from "@progress/kendo-react-layout";
+import type { SVGIcon } from "@progress/kendo-svg-icons";
 import { calendarIcon, heartIcon, homeIcon, userIcon } from "@progress/kendo-svg-icons";
 import { getSavedProfile, subscribeToProfile } from "../profile/profile-data";
 
-const items = [
+interface NavItem {
+  text: string;
+  svgIcon: SVGIcon;
+  route: string;
+  matchRoutes?: string[];
+}
+
+const items: NavItem[] = [
   { text: "Home", svgIcon: homeIcon, route: "/" },
   { text: "Discover", svgIcon: heartIcon, route: "/recommendations" },
-  { text: "Schedule", svgIcon: calendarIcon, route: "/schedule" },
+  {
+    text: "Schedule",
+    svgIcon: calendarIcon,
+    route: "/schedule",
+    matchRoutes: ["/schedule"],
+  },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
 
@@ -35,14 +48,13 @@ export function BottomNav() {
       themeColor="primary"
       items={items.map((item) => ({
         ...item,
-        selected:
-          item.route === "/"
+        selected: item.matchRoutes
+          ? item.matchRoutes.includes(pathname)
+          : item.route === "/"
             ? pathname === item.route
             : pathname.startsWith(item.route),
       }))}
-      onSelect={(e) =>
-        router.push(e.itemTarget.route)
-      }
+      onSelect={(e) => router.push(e.itemTarget.route)}
     />
   );
 }
