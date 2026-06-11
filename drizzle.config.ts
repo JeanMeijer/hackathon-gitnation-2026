@@ -1,5 +1,9 @@
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
+import ws from "ws";
+import { neonConfig } from "@neondatabase/serverless";
+
+neonConfig.webSocketConstructor = ws;
 
 export default defineConfig({
   out: "./drizzle",
