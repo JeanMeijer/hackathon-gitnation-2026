@@ -1,0 +1,23 @@
+app/env.ts
+  s_51187be230f306::t_f7b05c6a2679f7 1-26
+next.config.ts
+  s_51187be230f306::t_4d9f49f9b540d0 2
+package.json
+  s_51187be230f306::t_3ce8b7440fcfe1 21,24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e9700781469233c2f207320def68dacd85173e52",
+  "prompts": {},
+  "sessions": {
+    "s_51187be230f306": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7da1424b-511f-4f2e-9e2e-6f569de2ee4b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  }
+}
