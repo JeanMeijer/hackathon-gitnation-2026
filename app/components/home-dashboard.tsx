@@ -1,219 +1,141 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useSyncExternalStore, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Chip } from "@progress/kendo-react-buttons";
-import { Card, CardBody } from "@progress/kendo-react-layout";
-import { calendarIcon, envelopeIcon, heartIcon } from "@progress/kendo-svg-icons";
+import { SvgIcon } from "@progress/kendo-react-common";
+import { Button } from "@progress/kendo-react-buttons";
+import {
+  Avatar,
+  Card,
+  CardBody,
+  CardTitle,
+} from "@progress/kendo-react-layout";
+import {
+  envelopeIcon,
+  inboxIcon,
+  paperPlaneIcon,
+} from "@progress/kendo-svg-icons";
 import {
   getSentInvites,
   receivedInvites,
   subscribeToSentInvites,
   type SentInvite,
 } from "../invites/invite-data";
-import {
-  getBookedMeetings,
-  subscribeToBookedMeetings,
-  type BookedMeeting,
-} from "@/lib/schedule/booked-meetings";
-import { MOCK_USER_SCHEDULE } from "@/lib/schedule/mock-events";
-import type { ScheduleEvent } from "@/lib/schedule/types";
+import MySchedule from "./my-schedule";
 import styles from "./home-dashboard.module.css";
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "short",
-  timeZone: "Europe/Amsterdam",
-});
-
-const timeFormatter = new Intl.DateTimeFormat("en-US", {
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "Europe/Amsterdam",
-});
-
-function formatLocation(event: ScheduleEvent) {
-  if ("location" in event && event.location) {
-    return event.location;
+function handleStatCardKeyDown(
+  event: KeyboardEvent<HTMLDivElement>,
+  route: string,
+  navigate: (route: string) => void,
+) {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    navigate(route);
   }
-
-  if ("trackName" in event && event.trackName) {
-    return event.trackName;
-  }
-
-  return "GitNation venue";
 }
 
 const emptySentInvites: SentInvite[] = [];
-const emptyBookedMeetings: BookedMeeting[] = [];
 
 export default function HomeDashboard() {
   const router = useRouter();
   const sentInvites = useSyncExternalStore(
     subscribeToSentInvites,
     getSentInvites,
-    () => emptySentInvites,
-  );
-  const bookedMeetings = useSyncExternalStore(
-    subscribeToBookedMeetings,
-    getBookedMeetings,
-    () => emptyBookedMeetings,
-  );
-  const upcomingEvents = useMemo(
-    () =>
-      [...MOCK_USER_SCHEDULE, ...bookedMeetings]
-        .sort((a, b) => a.start.getTime() - b.start.getTime())
-        .slice(0, 4),
-    [bookedMeetings],
-  );
-  const meets = useMemo(
-    () =>
-      [...MOCK_USER_SCHEDULE, ...bookedMeetings]
-        .filter((event) => event.type === "meeting")
-        .sort((a, b) => a.start.getTime() - b.start.getTime()),
-    [bookedMeetings],
+    () => emptySentInvites
   );
 
   return (
     <main className={styles.shell}>
       <div className={styles.wrap}>
         <header className={styles.hero}>
-          <div>
-            <h1 className={styles.title}>Your GitNation day</h1>
-            <p className={styles.subtitle}>
-              Upcoming sessions, scheduled meets, and invite activity in one
-              place.
-            </p>
-          </div>
-          <div className={styles.heroActions}>
-            <Button
-              themeColor="primary"
-              svgIcon={heartIcon}
-              onClick={() => router.push("/recommendations")}
-            >
-              Find people
-            </Button>
-            <Button
-              fillMode="outline"
-              svgIcon={calendarIcon}
-              onClick={() => router.push("/schedule")}
-            >
-              Open schedule
-            </Button>
-          </div>
+          <h1 className={styles.title}>Your GitNation day</h1>
         </header>
 
         <section className={styles.grid}>
-          <Card className={styles.card} orientation="vertical">
-            <CardBody className={styles.cardBody}>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>Upcoming events</h2>
-                <Button
-                  fillMode="flat"
-                  themeColor="primary"
-                  onClick={() => router.push("/schedule")}
-                >
-                  View all
-                </Button>
-              </div>
-              <div className={styles.list}>
-                {upcomingEvents.map((event) => (
-                  <article key={event.id} className={styles.eventItem}>
-                    <div className={styles.time} aria-hidden="true">
-                      <span className={styles.day}>
-                        {dateFormatter.format(event.start)}
-                      </span>
-                      <span className={styles.hour}>
-                        {timeFormatter.format(event.start)}
-                      </span>
-                    </div>
-                    <div className={styles.eventContent}>
-                      <p className={styles.eventTitle}>{event.title}</p>
-                      <p className={styles.eventMeta}>
-                        {formatLocation(event)} · {timeFormatter.format(event.end)}
-                      </p>
-                      <div className={styles.chipRow}>
-                        <Chip
-                          className={styles.chip}
-                          text={event.type}
-                          rounded="full"
-                          fillMode="outline"
-                          themeColor={event.type === "meeting" ? "success" : "info"}
-                        />
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
+          <Card
+            className={`${styles.card} ${styles.scheduleCard}`}
+            orientation="vertical"
+          >
+            <CardBody className={styles.scheduleCardBody}>
+              <MySchedule variant="embedded" />
             </CardBody>
           </Card>
 
-          <div className={styles.list}>
-            <Card className={styles.card} orientation="vertical">
-              <CardBody className={styles.cardBody}>
-                <div className={styles.sectionHeader}>
-                  <h2 className={styles.sectionTitle}>Meets</h2>
-                  <Button
-                    fillMode="flat"
-                    themeColor="primary"
-                    svgIcon={envelopeIcon}
-                    onClick={() => router.push("/invites")}
-                  >
-                    Invites
-                  </Button>
-                </div>
-                <div className={styles.stats}>
-                  <button
-                    className={styles.stat}
-                    type="button"
-                    onClick={() => router.push("/invites#received")}
-                  >
+          <Card
+            className={`${styles.card} ${styles.meetsCard}`}
+            orientation="vertical"
+          >
+            <CardBody className={styles.meetsBody}>
+              <CardTitle className={styles.sectionTitle}>Meets</CardTitle>
+              <Button
+                className={styles.invitesButton}
+                fillMode="outline"
+                size="medium"
+                themeColor="primary"
+                svgIcon={envelopeIcon}
+                onClick={() => router.push("/invites")}
+              >
+                Invites
+              </Button>
+              <div className={styles.stats}>
+                <Card
+                  className={styles.statCard}
+                  orientation="vertical"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => router.push("/invites#received")}
+                  onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                    handleStatCardKeyDown(event, "/invites#received", router.push)
+                  }
+                >
+                  <CardBody className={styles.statCardBody}>
+                    <Avatar
+                      className={styles.statIcon}
+                      type="icon"
+                      size="medium"
+                      themeColor="primary"
+                      fillMode="outline"
+                      rounded="medium"
+                    >
+                      <SvgIcon icon={inboxIcon} />
+                    </Avatar>
                     <span className={styles.statValue}>
                       {receivedInvites.length}
                     </span>
                     <span className={styles.statLabel}>received</span>
-                  </button>
-                  <button
-                    className={styles.stat}
-                    type="button"
-                    onClick={() => router.push("/invites#sent")}
-                  >
-                    <span className={styles.statValue}>{sentInvites.length}</span>
+                  </CardBody>
+                </Card>
+                <Card
+                  className={styles.statCard}
+                  orientation="vertical"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => router.push("/invites#sent")}
+                  onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
+                    handleStatCardKeyDown(event, "/invites#sent", router.push)
+                  }
+                >
+                  <CardBody className={styles.statCardBody}>
+                    <Avatar
+                      className={styles.statIcon}
+                      type="icon"
+                      size="medium"
+                      themeColor="primary"
+                      fillMode="outline"
+                      rounded="medium"
+                    >
+                      <SvgIcon icon={paperPlaneIcon} />
+                    </Avatar>
+                    <span className={styles.statValue}>
+                      {sentInvites.length}
+                    </span>
                     <span className={styles.statLabel}>sent</span>
-                  </button>
-                </div>
-                <div className={styles.inviteActions}>
-                  <Button
-                    fillMode="outline"
-                    themeColor="primary"
-                    svgIcon={envelopeIcon}
-                    onClick={() => router.push("/invites#received")}
-                  >
-                    See invites
-                  </Button>
-                  <Button
-                    fillMode="outline"
-                    themeColor="primary"
-                    onClick={() => router.push("/invites#sent")}
-                  >
-                    Sent invites
-                  </Button>
-                </div>
-                <div className={styles.list}>
-                  {meets.map((meet) => (
-                    <article key={meet.id} className={styles.meetCard}>
-                      <p className={styles.eventTitle}>{meet.title}</p>
-                      <p className={styles.eventMeta}>
-                        {dateFormatter.format(meet.start)} ·{" "}
-                        {timeFormatter.format(meet.start)} ·{" "}
-                        {formatLocation(meet)}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </CardBody>
-            </Card>
-          </div>
+                  </CardBody>
+                </Card>
+              </div>
+            </CardBody>
+          </Card>
         </section>
       </div>
     </main>

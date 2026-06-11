@@ -1,6 +1,8 @@
+import { DEFAULT_VENUE_ADDRESS } from "@/lib/map/venue-location";
 import { MOCK_EVENT_DETAILS } from "./mock-event-details";
+import { MOCK_CONFERENCE_SCHEDULE } from "./mock-conference-schedule";
 import { MOCK_USER_SCHEDULE } from "./mock-events";
-import { EVENT_TYPE_RESOURCE } from "./resources";
+import { EVENT_TYPE_THEME } from "./event-type-theme";
 import type { ScheduleEvent, ScheduleEventType } from "./types";
 
 const DATE_FORMAT: Intl.DateTimeFormatOptions = {
@@ -23,13 +25,18 @@ function cloneEvent(event: ScheduleEvent): ScheduleEvent {
 }
 
 export function getMockEventById(id: string): ScheduleEvent | undefined {
-  const event = MOCK_USER_SCHEDULE.find((item) => item.id === id);
+  const event =
+    MOCK_USER_SCHEDULE.find((item) => item.id === id) ??
+    MOCK_CONFERENCE_SCHEDULE.find((item) => item.id === id);
   return event ? cloneEvent(event) : undefined;
 }
 
+export function isConferenceEvent(event: ScheduleEvent): boolean {
+  return MOCK_CONFERENCE_SCHEDULE.some((item) => item.id === event.id);
+}
+
 export function getEventTypeLabel(type: ScheduleEventType): string {
-  const match = EVENT_TYPE_RESOURCE.data.find((item) => item.value === type);
-  return match?.text ?? type;
+  return EVENT_TYPE_THEME[type]?.label ?? type;
 }
 
 export function getEventDescription(event: ScheduleEvent): string {
@@ -60,4 +67,29 @@ export function formatEventDate(date: Date): string {
 export function formatEventTimeRange(start: Date, end: Date): string {
   const formatter = new Intl.DateTimeFormat(undefined, TIME_FORMAT);
   return `${formatter.format(start)} – ${formatter.format(end)}`;
+}
+
+export function formatEventStartTime(start: Date): string {
+  return new Intl.DateTimeFormat(undefined, TIME_FORMAT).format(start);
+}
+
+export function getEventLocationDisplay(event: ScheduleEvent): string {
+  const location = "location" in event ? event.location : undefined;
+  return location ?? DEFAULT_VENUE_ADDRESS;
+}
+
+export function getEventLocationLabel(event: ScheduleEvent): string | undefined {
+  if (event.type === "talk") {
+    return event.trackName;
+  }
+
+  if (
+    event.type === "meeting" ||
+    event.type === "custom" ||
+    event.type === "break"
+  ) {
+    return event.location;
+  }
+
+  return undefined;
 }

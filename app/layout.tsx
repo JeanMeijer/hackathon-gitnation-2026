@@ -28,11 +28,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-dvh antialiased`}
     >
-      <body className="min-h-full flex flex-col pb-16">
+      <body className="flex h-dvh flex-col overflow-x-hidden pb-16">
         <QueryProvider>
-          {children}
+          <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden">
+            {children}
+          </div>
           <BottomNav />
         </QueryProvider>
       </body>
