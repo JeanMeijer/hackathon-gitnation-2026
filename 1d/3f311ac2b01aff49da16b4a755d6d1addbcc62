@@ -1,0 +1,32 @@
+app/page.tsx
+  s_350c57b54e166a::t_6626aff488d41f 3,6
+  s_350c57b54e166a::t_2f80c012d19c6d 1-2,4,7-15
+app/api/schedule/route.ts
+  s_350c57b54e166a::t_208b6278cd18a3 1-5,7,10,16-19,28-30
+  s_350c57b54e166a::t_6aa4ef7553c9df 6,8-9,11-15,20-27
+hooks/use-schedule-query.ts
+  s_350c57b54e166a::t_009ea7a97261b4 1-14,24-25
+  s_350c57b54e166a::t_239d4c05bb5bba 15,20,23
+  h_2169b0bd9b5c87 16-19,21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "1d3f311ac2b01aff49da16b4a755d6d1addbcc62",
+  "prompts": {},
+  "humans": {
+    "h_2169b0bd9b5c87": {
+      "author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  },
+  "sessions": {
+    "s_350c57b54e166a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa46a346-8236-49cc-aa7c-890eb8dfdaf5",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  }
+}
