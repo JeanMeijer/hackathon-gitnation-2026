@@ -1,11 +1,24 @@
 import { relations } from "drizzle-orm";
 import {
   integer,
+  pgEnum,
   pgTable,
   primaryKey,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+
+export const interestTypeEnum = pgEnum("interest_type", ["tech", "non_tech"]);
+
+export const profiles = pgTable("profiles", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: text().notNull(),
+});
+
+export const interests = pgTable("interests", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  type: interestTypeEnum().notNull(),
+});
 
 export const tracks = pgTable("tracks", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -42,6 +55,19 @@ export const talkSpeakers = pgTable(
   (t) => [primaryKey({ columns: [t.talkId, t.speakerId] })],
 );
 
+export const profileInterests = pgTable(
+  "profile_interests",
+  {
+    profileId: integer()
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    interestId: integer()
+      .notNull()
+      .references(() => interests.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.profileId, t.interestId] })],
+);
+
 export const tracksRelations = relations(tracks, ({ many }) => ({
   talks: many(talks),
 }));
@@ -60,5 +86,25 @@ export const talkSpeakersRelations = relations(talkSpeakers, ({ one }) => ({
   speaker: one(speakers, {
     fields: [talkSpeakers.speakerId],
     references: [speakers.id],
+  }),
+}));
+
+
+export const profilesRelations = relations(profiles, ({ many }) => ({
+  interests: many(profileInterests),
+}));
+
+export const interestsRelations = relations(interests, ({ many }) => ({
+  profiles: many(profileInterests),
+}));
+
+export const profileInterestsRelations = relations(profileInterests, ({ one }) => ({
+  profile: one(profiles, {
+    fields: [profileInterests.profileId],
+    references: [profiles.id],
+  }),
+  interest: one(interests, {
+    fields: [profileInterests.interestId],
+    references: [interests.id],
   }),
 }));
