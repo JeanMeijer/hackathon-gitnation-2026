@@ -8,6 +8,20 @@
       "when": 1781176041494,
       "tag": "0000_lovely_unicorn",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781188318278,
+      "tag": "0001_perpetual_clea",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781189726661,
+      "tag": "0002_sturdy_oracle",
+      "breakpoints": true
     }
   ]
 }
