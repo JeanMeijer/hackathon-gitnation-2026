@@ -206,9 +206,17 @@ export default function EventMapDialog({
               attribution={MAP_TILE_ATTRIBUTION}
             />
             <MapMarkerLayer
-              data={MAP_MARKERS}
+              data={MAP_MARKERS.filter((marker) => marker.name === "Destination")}
               locationField="latlng"
               titleField="name"
+            />
+            <MapMarkerLayer
+              data={MAP_MARKERS.filter((marker) => marker.name === "Start")}
+              locationField="latlng"
+              titleField="name"
+              template={() =>
+                `<span class="event-map-marker-dot" aria-hidden="true"></span>`
+              }
             />
           </MapLayers>
         </KendoMap>
