@@ -24,7 +24,7 @@ const items: NavItem[] = [
     text: "Schedule",
     svgIcon: calendarIcon,
     route: "/schedule",
-    matchRoutes: ["/schedule"],
+    matchRoutes: ["/schedule", "/event"],
   },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
@@ -48,11 +48,14 @@ export function BottomNav() {
       themeColor="primary"
       items={items.map((item) => ({
         ...item,
-        selected: item.matchRoutes
-          ? item.matchRoutes.includes(pathname)
-          : item.route === "/"
-            ? pathname === item.route
-            : pathname.startsWith(item.route),
+      selected: item.matchRoutes
+        ? item.matchRoutes.some(
+            (route) =>
+              pathname === route || pathname.startsWith(`${route}/`),
+          )
+        : item.route === "/"
+          ? pathname === item.route
+          : pathname.startsWith(item.route),
       }))}
       onSelect={(e) => router.push(e.itemTarget.route)}
     />
