@@ -3,15 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
-import { Button, Chip } from "@progress/kendo-react-buttons";
+import { Button } from "@progress/kendo-react-buttons";
 import { Card, CardBody, CardSubtitle, CardTitle } from "@progress/kendo-react-layout";
-import { chevronLeftIcon } from "@progress/kendo-svg-icons";
+import { checkIcon, chevronLeftIcon } from "@progress/kendo-svg-icons";
 import EventMapDialog from "@/app/components/event-map-dialog";
 import {
   defaultUserProfile,
   getProfileSnapshot,
   subscribeToProfile,
 } from "@/app/profile/profile-data";
+import {
+  addCustomScheduleEvent,
+  isScheduleEventJoined,
+  removeCustomScheduleEvent,
+  subscribeToCustomScheduleEvents,
+} from "@/lib/schedule/custom-events";
 import {
   formatEventDate,
   formatEventTimeRange,
@@ -20,7 +26,9 @@ import {
   getEventLobbyAttendeeNames,
   getEventTypeLabel,
   getMockEventById,
+  isConferenceEvent,
 } from "@/lib/schedule/event-lookup";
+import { getEventTypeThemeClass } from "@/lib/schedule/event-type-theme";
 import type { ScheduleEvent } from "@/lib/schedule/types";
 
 interface EventPageProps {
@@ -73,12 +81,14 @@ function EventDetails({
     <Card className="border-0 shadow-none">
       <CardBody className="flex flex-col gap-5 p-0">
         <div className="flex flex-wrap items-center gap-2">
-          <Chip
-            text={getEventTypeLabel(event.type)}
-            rounded="full"
-            fillMode="outline"
-            themeColor="info"
-          />
+          <span
+            className={[
+              "event-type-label-pill",
+              getEventTypeThemeClass(event.type, "event-type-label-pill"),
+            ].join(" ")}
+          >
+            {getEventTypeLabel(event.type)}
+          </span>
         </div>
 
         <dl className="grid gap-4">
@@ -188,6 +198,35 @@ function EventNotFound() {
   );
 }
 
+function EventJoinAction({
+  event,
+  joined,
+  onToggle,
+}: {
+  event: ScheduleEvent;
+  joined: boolean;
+  onToggle: () => void;
+}) {
+  if (!isConferenceEvent(event)) {
+    return null;
+  }
+
+  return (
+    <div className="border-t border-black/10 px-4 py-4">
+      <Button
+        fillMode={joined ? "outline" : "solid"}
+        themeColor={joined ? "base" : "primary"}
+        svgIcon={joined ? checkIcon : undefined}
+        size="large"
+        className="w-full"
+        onClick={onToggle}
+      >
+        {joined ? "Leave event" : "Join event"}
+      </Button>
+    </div>
+  );
+}
+
 export default function EventPage({ eventId }: EventPageProps) {
   const router = useRouter();
   const [mapOpen, setMapOpen] = useState(false);
@@ -197,6 +236,24 @@ export default function EventPage({ eventId }: EventPageProps) {
     () => getProfileSnapshot(defaultUserProfile),
     () => defaultUserProfile,
   );
+  const joined = useSyncExternalStore(
+    subscribeToCustomScheduleEvents,
+    () => isScheduleEventJoined(eventId),
+    () => false,
+  );
+
+  const handleToggleJoin = () => {
+    if (!event) {
+      return;
+    }
+
+    if (joined) {
+      removeCustomScheduleEvent(event.id);
+      return;
+    }
+
+    addCustomScheduleEvent(event);
+  };
 
   if (!event) {
     return <EventNotFound />;
@@ -209,9 +266,9 @@ export default function EventPage({ eventId }: EventPageProps) {
           fillMode="flat"
           themeColor="primary"
           svgIcon={chevronLeftIcon}
-          onClick={() => router.push("/")}
+          onClick={() => router.back()}
         >
-          Back to schedule
+          Back
         </Button>
       </header>
 
@@ -223,6 +280,12 @@ export default function EventPage({ eventId }: EventPageProps) {
 
         <EventLobby event={event} currentUserName={profile.name} />
       </div>
+
+      <EventJoinAction
+        event={event}
+        joined={joined}
+        onToggle={handleToggleJoin}
+      />
 
       <EventMapDialog
         open={mapOpen}

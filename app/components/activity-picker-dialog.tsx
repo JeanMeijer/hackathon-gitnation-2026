@@ -25,6 +25,8 @@ import {
   getActivityTypeLabel,
   type PredefinedActivity,
 } from "@/lib/schedule/activities";
+import { formatEventTimeRange } from "@/lib/schedule/event-lookup";
+import { EVENT_TYPE_ORDER } from "@/lib/schedule/event-type-theme";
 import {
   formatOverlapWarning,
   getOverlappingEvents,
@@ -54,13 +56,6 @@ interface ActivityPickerDialogProps {
 
 type EditingField = "start" | "end" | null;
 
-const EVENT_TYPE_ORDER: ScheduleEventType[] = [
-  "talk",
-  "meeting",
-  "break",
-  "custom",
-];
-
 const EVENT_TYPE_ICONS: Record<ScheduleEventType, SVGIcon> = {
   talk: microphoneIcon,
   meeting: usersIcon,
@@ -72,6 +67,20 @@ const TIME_FORMAT: Intl.DateTimeFormatOptions = {
   hour: "numeric",
   minute: "2-digit",
 };
+
+function getActivityTimeRange(
+  activityStart: Date | null,
+  activity: PredefinedActivity,
+): string | null {
+  if (!activityStart) {
+    return null;
+  }
+
+  return formatEventTimeRange(
+    activityStart,
+    addMinutes(activityStart, activity.durationMinutes),
+  );
+}
 
 function getActivitySubtitle(activity: PredefinedActivity): string {
   const parts = [`${activity.durationMinutes} min`];
@@ -290,6 +299,7 @@ export default function ActivityPickerDialog({
                   <div className="flex flex-col gap-2">
                     {filteredActivities.map((activity) => {
                       const overlapWarning = getOverlapWarning(activity);
+                      const timeRange = getActivityTimeRange(start, activity);
 
                       return (
                         <Card
@@ -302,6 +312,11 @@ export default function ActivityPickerDialog({
                               <CardTitle className="!text-sm !font-medium">
                                 {activity.title}
                               </CardTitle>
+                              {timeRange ? (
+                                <p className="activity-picker-card-time">
+                                  {timeRange}
+                                </p>
+                              ) : null}
                               <CardSubtitle className="!text-xs">
                                 {getActivitySubtitle(activity)}
                               </CardSubtitle>

@@ -43,10 +43,12 @@ function EmbeddedScheduleEventContent({
   event,
   start,
   title,
+  joined,
 }: {
   event: ScheduleEvent;
   start: Date;
   title: string;
+  joined?: boolean;
 }) {
   const location = getEventLocationLabel(event);
   const time = formatEventStartTime(start);
@@ -56,10 +58,17 @@ function EmbeddedScheduleEventContent({
     <div className="schedule-event-card">
       <div className="schedule-event-header">
         <div className="schedule-event-title">{title}</div>
-        <span
-          className={`schedule-event-type schedule-event-type-${event.type}`}
-        >
-          {event.type}
+        <span className="schedule-event-badges">
+          {joined ? (
+            <span className="schedule-event-joined-badge" aria-label="Joined">
+              Joined
+            </span>
+          ) : null}
+          <span
+            className={`schedule-event-type schedule-event-type-${event.type}`}
+          >
+            {event.type}
+          </span>
         </span>
       </div>
       <div className="schedule-event-meta">{meta}</div>
@@ -78,6 +87,7 @@ function ShadowScheduleEventContent() {
 
 interface CreateScheduleItemOptions {
   variant?: "page" | "embedded";
+  joinedEventIds?: Set<string>;
 }
 
 export function createScheduleItem(
@@ -86,16 +96,21 @@ export function createScheduleItem(
   options: CreateScheduleItemOptions = {},
 ) {
   const embedded = options.variant === "embedded";
+  const joinedEventIds = options.joinedEventIds;
 
   return function ScheduleItem(props: SchedulerItemProps) {
     const shadow = isShadowScheduleEvent(props.dataItem);
     const past = !shadow && isPastEvent(props.end);
+    const eventId =
+      props.dataItem?.id != null ? String(props.dataItem.id) : undefined;
+    const joined = Boolean(eventId && joinedEventIds?.has(eventId));
     const className = [
       props.className,
       shadow ? "schedule-event-shadow" : undefined,
       past ? "k-event-past" : undefined,
       shadow ? "schedule-shadow-clickable" : "schedule-event-clickable",
       embedded && !shadow ? "schedule-event-embedded" : undefined,
+      joined ? "schedule-event-joined" : undefined,
     ]
       .filter(Boolean)
       .join(" ");
@@ -139,6 +154,7 @@ export function createScheduleItem(
             event={scheduleEvent}
             start={props.start}
             title={title}
+            joined={joined}
           />
         ) : (
           props.children

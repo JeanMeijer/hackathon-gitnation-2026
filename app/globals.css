@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --event-type-talk: #1274ac;
+  --event-type-meeting: #3a9b23;
+  --event-type-break: #656565;
+  --event-type-custom: #7630bc;
 }
 
 @theme inline {
@@ -153,19 +157,19 @@ body {
 }
 
 .my-schedule-embedded .schedule-event-type-talk {
-  color: #1274ac;
+  color: var(--event-type-talk);
 }
 
 .my-schedule-embedded .schedule-event-type-meeting {
-  color: #3a9b23;
+  color: var(--event-type-meeting);
 }
 
 .my-schedule-embedded .schedule-event-type-break {
-  color: #656565;
+  color: var(--event-type-break);
 }
 
 .my-schedule-embedded .schedule-event-type-custom {
-  color: #7630bc;
+  color: var(--event-type-custom);
 }
 
 .my-schedule-embedded .k-event.schedule-event-shadow,
@@ -269,31 +273,39 @@ body {
 }
 
 .activity-picker-type-button-talk,
-.activity-picker-category-pill-talk {
-  color: #1274ac;
-  border-color: #1274ac;
-  background-color: color-mix(in srgb, #1274ac 10%, transparent);
+.activity-picker-category-pill-talk,
+.event-type-filter-pill-talk {
+  --event-type-color: var(--event-type-talk);
+  color: var(--event-type-talk);
+  border-color: var(--event-type-talk);
+  background-color: color-mix(in srgb, var(--event-type-talk) 10%, transparent);
 }
 
 .activity-picker-type-button-meeting,
-.activity-picker-category-pill-meeting {
-  color: #3a9b23;
-  border-color: #3a9b23;
-  background-color: color-mix(in srgb, #3a9b23 10%, transparent);
+.activity-picker-category-pill-meeting,
+.event-type-filter-pill-meeting {
+  --event-type-color: var(--event-type-meeting);
+  color: var(--event-type-meeting);
+  border-color: var(--event-type-meeting);
+  background-color: color-mix(in srgb, var(--event-type-meeting) 10%, transparent);
 }
 
 .activity-picker-type-button-break,
-.activity-picker-category-pill-break {
-  color: #656565;
-  border-color: #656565;
-  background-color: color-mix(in srgb, #656565 10%, transparent);
+.activity-picker-category-pill-break,
+.event-type-filter-pill-break {
+  --event-type-color: var(--event-type-break);
+  color: var(--event-type-break);
+  border-color: var(--event-type-break);
+  background-color: color-mix(in srgb, var(--event-type-break) 10%, transparent);
 }
 
 .activity-picker-type-button-custom,
-.activity-picker-category-pill-custom {
-  color: #7630bc;
-  border-color: #7630bc;
-  background-color: color-mix(in srgb, #7630bc 10%, transparent);
+.activity-picker-category-pill-custom,
+.event-type-filter-pill-custom {
+  --event-type-color: var(--event-type-custom);
+  color: var(--event-type-custom);
+  border-color: var(--event-type-custom);
+  background-color: color-mix(in srgb, var(--event-type-custom) 10%, transparent);
 }
 
 .activity-picker-type-icon {
@@ -383,6 +395,14 @@ body {
   min-width: 0;
 }
 
+.activity-picker-card-time {
+  margin: 0.15rem 0 0.1rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.3;
+  color: #17201c;
+}
+
 .activity-picker-card-add {
   flex-shrink: 0;
   margin-left: auto;
@@ -456,4 +476,123 @@ body {
   border-radius: 50%;
   background: #b71c1c;
   box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.discover-shell {
+  min-height: calc(100dvh - 4rem);
+}
+
+.discover-tabstrip.k-tabstrip {
+  border: none;
+  background: transparent;
+}
+
+.discover-tabstrip .k-tabstrip-content {
+  display: none;
+}
+
+.discover-tabstrip .k-tabstrip-items-wrapper {
+  border-bottom: none;
+}
+
+.discover-tabstrip .k-tabstrip-item .k-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding-block: 0.85rem;
+}
+
+.discover-events-filters {
+  background: #fbfcfa;
+}
+
+.event-type-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--event-type-color);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--event-type-color);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.event-type-filter-pill:focus-visible {
+  outline: 2px solid var(--event-type-color);
+  outline-offset: 2px;
+}
+
+.event-type-filter-pill-active {
+  background-color: color-mix(in srgb, var(--event-type-color) 18%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--event-type-color) 20%, transparent);
+}
+
+.event-type-filter-pill-inactive {
+  background-color: color-mix(in srgb, var(--event-type-color) 6%, transparent);
+  opacity: 0.55;
+}
+
+.discover-events-schedule-shell {
+  background: #fbfcfa;
+}
+
+.schedule-event-badges {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.schedule-event-joined-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--event-type-talk) 14%, white);
+  color: var(--event-type-talk);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.my-schedule-embedded .k-event.schedule-event-joined {
+  box-shadow:
+    0 4px 12px rgba(23, 32, 28, 0.06),
+    inset 0 0 0 2px color-mix(in srgb, var(--event-type-talk) 45%, transparent);
+}
+
+.event-type-label-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.event-type-label-pill-talk {
+  color: var(--event-type-talk);
+}
+
+.event-type-label-pill-meeting {
+  color: var(--event-type-meeting);
+}
+
+.event-type-label-pill-break {
+  color: var(--event-type-break);
+}
+
+.event-type-label-pill-custom {
+  color: var(--event-type-custom);
 }

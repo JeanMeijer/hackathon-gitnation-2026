@@ -28,7 +28,7 @@ const items: NavItem[] = [
     route: "/",
     matchRoutes: ["/", "/event"],
   },
-  { text: "Discover", svgIcon: heartIcon, route: "/recommendations" },
+  { text: "Discover", svgIcon: heartIcon, route: "/discover" },
   { text: "Invites", svgIcon: envelopeIcon, route: "/invites" },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
