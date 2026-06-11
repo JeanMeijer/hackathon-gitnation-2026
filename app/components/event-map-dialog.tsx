@@ -1,15 +1,20 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, type ComponentRef } from "react";
 import { Path } from "@progress/kendo-drawing";
 import { Dialog } from "@progress/kendo-react-dialogs";
 import {
-  Map,
+  Map as KendoMap,
   MapLayers,
   MapMarkerLayer,
   MapShapeLayer,
   MapTileLayer,
+  type MapClickEvent,
+  type PanEndEvent,
+  type PanEvent,
   type ResetEvent,
+  type ZoomEndEvent,
+  type ZoomStartEvent,
 } from "@progress/kendo-react-map";
 import {
   MAP_CENTER,
@@ -28,6 +33,46 @@ interface EventMapDialogProps {
 
 function tileUrl(args: { x: number; y: number; zoom: number }) {
   return `https://tile.openstreetmap.org/${args.zoom}/${args.x}/${args.y}.png`;
+}
+
+function locationToCoords(location: { lat: number; lng: number } | undefined) {
+  if (!location) {
+    return undefined;
+  }
+
+  return { lat: location.lat, lng: location.lng };
+}
+
+function getMapViewState(map: ResetEvent["target"]) {
+  const core = map.mapInstance;
+  if (!core) {
+    return {};
+  }
+
+  const center = core.center();
+  const extent = core.extent();
+
+  return {
+    center: locationToCoords(center),
+    zoom: core.zoom(),
+    extent: extent
+      ? {
+          nw: locationToCoords(extent.nw),
+          se: locationToCoords(extent.se),
+        }
+      : undefined,
+  };
+}
+
+function logMapView(
+  eventName: string,
+  map: ResetEvent["target"],
+  extra?: Record<string, unknown>,
+) {
+  console.log(`[EventMap] ${eventName}`, {
+    ...getMapViewState(map),
+    ...extra,
+  });
 }
 
 function drawRoute(map: ResetEvent["target"]) {
@@ -59,9 +104,52 @@ export default function EventMapDialog({
   onClose,
   title,
 }: EventMapDialogProps) {
+  const mapRef = useRef<ComponentRef<typeof KendoMap>>(null);
+
   const handleReset = useCallback((event: ResetEvent) => {
+    logMapView("reset", event.target);
     drawRoute(event.target);
   }, []);
+
+  const handlePan = useCallback((event: PanEvent) => {
+    logMapView("pan", event.target, {
+      origin: locationToCoords(event.origin),
+      center: locationToCoords(event.center),
+    });
+  }, []);
+
+  const handlePanEnd = useCallback((event: PanEndEvent) => {
+    logMapView("panEnd", event.target, {
+      origin: locationToCoords(event.origin),
+      center: locationToCoords(event.center),
+    });
+  }, []);
+
+  const handleZoomStart = useCallback((event: ZoomStartEvent) => {
+    logMapView("zoomStart", event.target);
+  }, []);
+
+  const handleZoomEnd = useCallback((event: ZoomEndEvent) => {
+    logMapView("zoomEnd", event.target);
+  }, []);
+
+  const handleMapClick = useCallback((event: MapClickEvent) => {
+    logMapView("click", event.target, {
+      location: locationToCoords(event.location),
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      mapRef.current?.refresh();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [open]);
 
   if (!open) {
     return null;
@@ -74,17 +162,25 @@ export default function EventMapDialog({
       title={dialogTitle}
       onClose={onClose}
       width="min(calc(100vw - 2rem), 720px)"
-      className="event-map-dialog-window"
+      className="event-map-dialog"
       contentStyle={{ overflow: "hidden", padding: 0 }}
     >
-      <div className="event-map-dialog">
-        <Map
+      <div className="event-map-dialog__map-shell">
+        <KendoMap
+          ref={mapRef}
           center={MAP_CENTER}
           zoom={MAP_ZOOM}
-          pannable={false}
-          zoomable={false}
-          controls={{ zoom: false, navigator: false, attribution: true }}
+          pannable
+          zoomable
+          wraparound={false}
+          controls={{ zoom: true, navigator: false }}
+          className="event-map-dialog__map"
           onReset={handleReset}
+          onPan={handlePan}
+          onPanEnd={handlePanEnd}
+          onZoomStart={handleZoomStart}
+          onZoomEnd={handleZoomEnd}
+          onMapClick={handleMapClick}
         >
           <MapLayers>
             <MapShapeLayer />
@@ -98,7 +194,7 @@ export default function EventMapDialog({
               titleField="name"
             />
           </MapLayers>
-        </Map>
+        </KendoMap>
       </div>
     </Dialog>
   );
