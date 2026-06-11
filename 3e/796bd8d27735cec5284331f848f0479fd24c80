@@ -1,0 +1,44 @@
+package.json
+  s_51187be230f306::t_62b5aef737c8d5 16,27-28,39
+  s_51187be230f306::t_caf36a22d8eb01 9-13
+app/env.ts
+  s_51187be230f306::t_490ebb5c6c6520 23
+  s_51187be230f306::t_b956153a90974f 9
+.env.example
+  s_51187be230f306::t_2db195d7c59992 1-2
+drizzle.config.ts
+  s_51187be230f306::t_8f82de03b4f4c9 1-7,9-12
+  s_51187be230f306::t_3201a61815d8fc 8
+lib/db/schema.ts
+  h_2169b0bd9b5c87 15
+  s_51187be230f306::t_7c66f17fc99e6c 9,16,30
+  s_51187be230f306::t_42acc4ecb79690 12,17-18,25
+  s_51187be230f306::t_9944d452d9c08f 1-8,10-11,13-14,19-24,26-29,31-64
+.gitignore
+  s_51187be230f306::t_54e43934055d76 39
+  s_51187be230f306::t_0fee982099b9ba 27-30
+lib/db/index.ts
+  s_51187be230f306::t_5da24d6f981696 1-7
+  s_51187be230f306::t_6b2df3fccdf170 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "3e796bd8d27735cec5284331f848f0479fd24c80",
+  "prompts": {},
+  "humans": {
+    "h_2169b0bd9b5c87": {
+      "author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  },
+  "sessions": {
+    "s_51187be230f306": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7da1424b-511f-4f2e-9e2e-6f569de2ee4b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  }
+}
