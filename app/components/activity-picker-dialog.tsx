@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { SvgIcon } from "@progress/kendo-react-common";
 import { Button } from "@progress/kendo-react-buttons";
 import { TimeSelector } from "@progress/kendo-react-dateinputs";
-import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
+import { Dialog } from "@progress/kendo-react-dialogs";
 import {
   Card,
   CardBody,
@@ -11,12 +12,19 @@ import {
   CardTitle,
 } from "@progress/kendo-react-layout";
 import {
+  chevronLeftIcon,
+  foodIcon,
+  microphoneIcon,
+  sparklesIcon,
+  usersIcon,
+  type SVGIcon,
+} from "@progress/kendo-svg-icons";
+import {
   createEventFromActivity,
+  getActivitiesByType,
   getActivityTypeLabel,
-  PREDEFINED_ACTIVITIES,
   type PredefinedActivity,
 } from "@/lib/schedule/activities";
-import { EVENT_TYPE_RESOURCE } from "@/lib/schedule/resources";
 import type { ScheduleEvent, ScheduleEventType } from "@/lib/schedule/types";
 
 export interface ActivityPickerDraft {
@@ -40,15 +48,17 @@ const EVENT_TYPE_ORDER: ScheduleEventType[] = [
   "custom",
 ];
 
+const EVENT_TYPE_ICONS: Record<ScheduleEventType, SVGIcon> = {
+  talk: microphoneIcon,
+  meeting: usersIcon,
+  break: foodIcon,
+  custom: sparklesIcon,
+};
+
 const TIME_FORMAT: Intl.DateTimeFormatOptions = {
   hour: "numeric",
   minute: "2-digit",
 };
-
-function getTypeColor(type: ScheduleEventType): string {
-  const entry = EVENT_TYPE_RESOURCE.data?.find((item) => item.value === type);
-  return entry?.color ?? "#656565";
-}
 
 function getActivitySubtitle(activity: PredefinedActivity): string {
   const parts = [`${activity.durationMinutes} min`];
@@ -96,31 +106,30 @@ export default function ActivityPickerDialog({
   onClose,
   onConfirm,
 }: ActivityPickerDialogProps) {
-  const [selectedActivity, setSelectedActivity] =
-    useState<PredefinedActivity | null>(null);
+  const [selectedType, setSelectedType] = useState<ScheduleEventType | null>(
+    null
+  );
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
 
-  const groupedActivities = useMemo(() => {
-    const byType = new Map<ScheduleEventType, PredefinedActivity[]>();
+  const slotDurationMinutes = getDurationMinutes(start, end);
 
-    for (const type of EVENT_TYPE_ORDER) {
-      byType.set(type, []);
-    }
+  const availableTypes = useMemo(
+    () =>
+      EVENT_TYPE_ORDER.filter(
+        (type) => getActivitiesByType(type, slotDurationMinutes).length > 0
+      ),
+    [slotDurationMinutes]
+  );
 
-    for (const activity of PREDEFINED_ACTIVITIES) {
-      byType.get(activity.type)?.push(activity);
-    }
-
-    return EVENT_TYPE_ORDER.flatMap((type) => {
-      const activities = (byType.get(type) ?? []).sort((a, b) =>
-        a.title.localeCompare(b.title)
-      );
-
-      return activities.length > 0 ? [{ type, activities }] : [];
-    });
-  }, []);
+  const filteredActivities = useMemo(
+    () =>
+      selectedType
+        ? getActivitiesByType(selectedType, slotDurationMinutes)
+        : [],
+    [selectedType, slotDurationMinutes]
+  );
 
   useEffect(() => {
     if (!open || !draft) {
@@ -128,7 +137,7 @@ export default function ActivityPickerDialog({
     }
 
     const frame = window.requestAnimationFrame(() => {
-      setSelectedActivity(null);
+      setSelectedType(null);
       setStart(new Date(draft.start));
       setEnd(new Date(draft.end));
       setEditingField(null);
@@ -137,29 +146,24 @@ export default function ActivityPickerDialog({
     return () => window.cancelAnimationFrame(frame);
   }, [open, draft]);
 
-  const canConfirm =
-    selectedActivity != null &&
-    start != null &&
-    end != null &&
-    end.getTime() > start.getTime();
-
   const handleTimeFieldClick = (field: Exclude<EditingField, null>) => {
     setEditingField((current) => (current === field ? null : field));
   };
 
-  const handleActivitySelect = (activity: PredefinedActivity) => {
-    setSelectedActivity(activity);
-
-    if (start) {
-      setEnd(addMinutes(start, activity.durationMinutes));
+  const handleAddActivity = (activity: PredefinedActivity) => {
+    if (!start) {
+      return;
     }
+
+    const eventEnd = addMinutes(start, activity.durationMinutes);
+    onConfirm(createEventFromActivity(activity, start, eventEnd));
+    onClose();
   };
 
   const handleTimeChange = (field: Exclude<EditingField, null>, time: Date) => {
     if (field === "start" && start) {
       const nextStart = mergeTime(start, time);
-      const durationMinutes =
-        selectedActivity?.durationMinutes ?? getDurationMinutes(start, end);
+      const durationMinutes = getDurationMinutes(start, end);
 
       setStart(nextStart);
       setEnd(addMinutes(nextStart, durationMinutes));
@@ -171,13 +175,14 @@ export default function ActivityPickerDialog({
     }
   };
 
-  const handleConfirm = () => {
-    if (!selectedActivity || !start || !end || !canConfirm) {
-      return;
-    }
+  const dialogTitle = "Add activity";
 
-    onConfirm(createEventFromActivity(selectedActivity, start, end));
-    onClose();
+  const handleTypeSelect = (type: ScheduleEventType) => {
+    setSelectedType(type);
+  };
+
+  const handleBackToTypes = () => {
+    setSelectedType(null);
   };
 
   if (!open || !draft) {
@@ -185,69 +190,114 @@ export default function ActivityPickerDialog({
   }
 
   return (
-    <Dialog title="Add activity" onClose={onClose} width={480}>
+    <Dialog title={dialogTitle} onClose={onClose} width={480}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <div
-            className="activity-picker-list -mx-1 max-h-72 overflow-y-auto px-1"
-            role="listbox"
-            aria-label="Predefined activities"
-          >
-            {groupedActivities.map(({ type, activities }) => (
-              <section key={type} className="mb-4 last:mb-0">
-                <h3
-                  className="activity-picker-group-title mb-2 text-xs font-semibold uppercase tracking-wide"
-                  style={{ color: getTypeColor(type) }}
+          {selectedType ? (
+            <>
+              <div className="activity-picker-category-header">
+                <Button
+                  type="button"
+                  fillMode="flat"
+                  className="activity-picker-back !justify-start !px-0"
+                  svgIcon={chevronLeftIcon}
+                  onClick={handleBackToTypes}
                 >
-                  {getActivityTypeLabel(type)}
-                </h3>
-                <div className="flex flex-col gap-2">
-                  {activities.map((activity) => {
-                    const selected = selectedActivity?.id === activity.id;
-
-                    return (
+                  All categories
+                </Button>
+                <span
+                  className={`activity-picker-category-pill activity-picker-category-pill-${selectedType}`}
+                >
+                  <span aria-hidden="true">
+                    <SvgIcon icon={EVENT_TYPE_ICONS[selectedType]} size="small" />
+                  </span>
+                  {getActivityTypeLabel(selectedType)}
+                </span>
+              </div>
+              <div
+                className="activity-picker-list -mx-1 max-h-72 overflow-y-auto px-1"
+                role="list"
+                aria-label={`${getActivityTypeLabel(selectedType)} activities`}
+              >
+                {filteredActivities.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {filteredActivities.map((activity) => (
                       <Card
                         key={activity.id}
-                        role="option"
-                        aria-selected={selected}
-                        tabIndex={0}
-                        className={[
-                          "activity-picker-card cursor-pointer transition-shadow",
-                          selected ? "activity-picker-card-selected" : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                        style={
-                          selected
-                            ? {
-                                borderColor: getTypeColor(activity.type),
-                                boxShadow: `inset 0 0 0 1px ${getTypeColor(activity.type)}`,
-                              }
-                            : undefined
-                        }
-                        onClick={() => handleActivitySelect(activity)}
-                        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            handleActivitySelect(activity);
-                          }
-                        }}
+                        role="listitem"
+                        className="activity-picker-card"
                       >
-                        <CardBody className="!py-3">
-                          <CardTitle className="!text-sm !font-medium">
-                            {activity.title}
-                          </CardTitle>
-                          <CardSubtitle className="!text-xs">
-                            {getActivitySubtitle(activity)}
-                          </CardSubtitle>
+                        <CardBody className="activity-picker-card-body !py-3">
+                          <div className="activity-picker-card-copy">
+                            <CardTitle className="!text-sm !font-medium">
+                              {activity.title}
+                            </CardTitle>
+                            <CardSubtitle className="!text-xs">
+                              {getActivitySubtitle(activity)}
+                            </CardSubtitle>
+                          </div>
+                          <Button
+                            type="button"
+                            size="small"
+                            themeColor="primary"
+                            className="activity-picker-card-add"
+                            onClick={() => handleAddActivity(activity)}
+                          >
+                            Add
+                          </Button>
                         </CardBody>
                       </Card>
-                    );
-                  })}
-                </div>
-              </section>
-            ))}
-          </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="px-1 py-6 text-center text-sm text-black/55">
+                    No activities fit in the selected time slot.
+                  </p>
+                )}
+              </div>
+            </>
+          ) : (
+            <div
+              className="activity-picker-type-grid"
+              role="group"
+              aria-label="Activity categories"
+            >
+              {availableTypes.map((type) => {
+                const count = getActivitiesByType(type, slotDurationMinutes)
+                  .length;
+
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    className={`activity-picker-type-button activity-picker-type-button-${type}`}
+                    onClick={() => handleTypeSelect(type)}
+                  >
+                    <span
+                      className="activity-picker-type-icon"
+                      aria-hidden="true"
+                    >
+                      <SvgIcon icon={EVENT_TYPE_ICONS[type]} size="medium" />
+                    </span>
+                    <span className="activity-picker-type-copy">
+                      <span className="activity-picker-type-label">
+                        {getActivityTypeLabel(type)}
+                      </span>
+                    </span>
+                    <span className="activity-picker-type-count">
+                      {count} {count === 1 ? "option" : "options"}
+                    </span>
+                  </button>
+                );
+              })}
+              {availableTypes.length === 0 ? (
+                <p className="col-span-2 px-1 py-6 text-center text-sm text-black/55">
+                  No activities fit in the selected time slot. Adjust the time
+                  below to see more options.
+                </p>
+              ) : null}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -293,13 +343,6 @@ export default function ActivityPickerDialog({
           )}
         </div>
       </div>
-
-      <DialogActionsBar layout="end">
-        <Button onClick={onClose}>Cancel</Button>
-        <Button themeColor="primary" disabled={!canConfirm} onClick={handleConfirm}>
-          Add to schedule
-        </Button>
-      </DialogActionsBar>
     </Dialog>
   );
 }

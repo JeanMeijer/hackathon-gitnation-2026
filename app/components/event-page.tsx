@@ -103,23 +103,23 @@ function EventLobby({
         Lobby
       </h2>
 
-      <ul className="grid gap-2">
+      <ul className="flex flex-wrap gap-2">
         <li>
-          <Card className="border border-black/8">
-            <CardBody className="py-3">
-              <CardTitle className="text-base font-medium">
+          <Card className="w-fit border border-black/8">
+            <CardBody className="px-3 py-2">
+              <CardTitle className="text-sm font-medium">
                 {currentUserName}
               </CardTitle>
-              <CardSubtitle className="text-sm text-black/55">You</CardSubtitle>
+              <CardSubtitle className="text-xs text-black/55">You</CardSubtitle>
             </CardBody>
           </Card>
         </li>
 
         {otherAttendees.map((name) => (
           <li key={name}>
-            <Card className="border border-black/8">
-              <CardBody className="py-3">
-                <CardTitle className="text-base font-medium">{name}</CardTitle>
+            <Card className="w-fit border border-black/8">
+              <CardBody className="px-3 py-2">
+                <CardTitle className="text-sm font-medium">{name}</CardTitle>
               </CardBody>
             </Card>
           </li>

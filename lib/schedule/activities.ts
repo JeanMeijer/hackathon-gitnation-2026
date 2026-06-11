@@ -140,6 +140,18 @@ export const PREDEFINED_ACTIVITIES: PredefinedActivity[] = [
   },
 ];
 
+export function getActivitiesByType(
+  type: ScheduleEventType,
+  maxDurationMinutes?: number
+): PredefinedActivity[] {
+  return PREDEFINED_ACTIVITIES.filter(
+    (activity) =>
+      activity.type === type &&
+      (maxDurationMinutes == null ||
+        activity.durationMinutes <= maxDurationMinutes)
+  ).sort((a, b) => a.title.localeCompare(b.title));
+}
+
 export function getActivityTypeLabel(type: ScheduleEventType): string {
   switch (type) {
     case "talk":

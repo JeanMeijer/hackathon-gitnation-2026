@@ -180,6 +180,133 @@ body {
   background-color: rgba(14, 165, 233, 0.08);
 }
 
+.activity-picker-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.activity-picker-type-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 4.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.activity-picker-type-button:hover {
+  box-shadow: 0 4px 12px rgba(23, 32, 28, 0.08);
+}
+
+.activity-picker-type-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.activity-picker-type-button-talk,
+.activity-picker-category-pill-talk {
+  color: #1274ac;
+  border-color: #1274ac;
+  background-color: color-mix(in srgb, #1274ac 10%, transparent);
+}
+
+.activity-picker-type-button-meeting,
+.activity-picker-category-pill-meeting {
+  color: #3a9b23;
+  border-color: #3a9b23;
+  background-color: color-mix(in srgb, #3a9b23 10%, transparent);
+}
+
+.activity-picker-type-button-break,
+.activity-picker-category-pill-break {
+  color: #656565;
+  border-color: #656565;
+  background-color: color-mix(in srgb, #656565 10%, transparent);
+}
+
+.activity-picker-type-button-custom,
+.activity-picker-category-pill-custom {
+  color: #7630bc;
+  border-color: #7630bc;
+  background-color: color-mix(in srgb, #7630bc 10%, transparent);
+}
+
+.activity-picker-type-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  color: inherit;
+  background-color: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.activity-picker-type-icon .k-svg-icon {
+  color: inherit;
+  fill: currentColor;
+}
+
+.activity-picker-type-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-picker-type-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: inherit;
+}
+
+.activity-picker-type-count {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: inherit;
+  opacity: 0.72;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.activity-picker-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.activity-picker-category-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.activity-picker-back {
+  align-self: center;
+  margin-bottom: 0;
+}
+
 .activity-picker-list {
   scrollbar-gutter: stable;
 }
@@ -188,13 +315,28 @@ body {
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
 }
 
+.activity-picker-card-body {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.activity-picker-card-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-picker-card-add {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 .activity-picker-card:focus-visible {
   outline: 2px solid var(--kendo-color-primary, #1274ac);
   outline-offset: 2px;
-}
-
-.activity-picker-card-selected {
-  background-color: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 6%, transparent);
 }
 
 .activity-time-editor {
