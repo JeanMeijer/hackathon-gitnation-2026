@@ -38,6 +38,14 @@ body {
   text-decoration-color: color-mix(in srgb, currentColor 60%, transparent);
 }
 
+.my-schedule .k-event.schedule-event-clickable {
+  cursor: pointer;
+}
+
+.my-schedule .k-event.schedule-event-clickable:hover {
+  filter: brightness(1.05);
+}
+
 .my-schedule .schedule-slot-empty {
   cursor: pointer;
 }
