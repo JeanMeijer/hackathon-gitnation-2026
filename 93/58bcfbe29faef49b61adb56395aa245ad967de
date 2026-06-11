@@ -1,0 +1,29 @@
+package.json
+  s_350c57b54e166a::t_cb2d051f24816e 27
+app/layout.tsx
+  h_2169b0bd9b5c87 5-6,34,37
+  s_350c57b54e166a::t_f4b17139308861 35-36
+app/components/bottom-nav.tsx
+  h_2169b0bd9b5c87 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9358bcfbe29faef49b61adb56395aa245ad967de",
+  "prompts": {},
+  "humans": {
+    "h_2169b0bd9b5c87": {
+      "author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  },
+  "sessions": {
+    "s_350c57b54e166a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa46a346-8236-49cc-aa7c-890eb8dfdaf5",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Jean P.D. Meijer <jean@analoginterface.io>"
+    }
+  }
+}
