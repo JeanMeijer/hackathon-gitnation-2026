@@ -1,0 +1,11 @@
+.tabs {
+  border: 0;
+  background: transparent;
+}
+
+.tabs :global(.k-tabstrip-content),
+.tabs :global(.k-content) {
+  padding: 18px 0 0;
+  border: 0;
+  background: transparent;
+}
