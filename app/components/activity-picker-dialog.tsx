@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SvgIcon } from "@progress/kendo-react-common";
 import { Button } from "@progress/kendo-react-buttons";
 import { TimeSelector } from "@progress/kendo-react-dateinputs";
 import { Dialog } from "@progress/kendo-react-dialogs";
+import { Loader } from "@progress/kendo-react-indicators";
 import {
   Card,
   CardBody,
@@ -68,9 +69,45 @@ const TIME_FORMAT: Intl.DateTimeFormatOptions = {
   minute: "2-digit",
 };
 
+const MATCHING_DELAY_MS = 3200;
+const GENERATED_MEETING_MIN_MINUTES = 20;
+const GENERATED_MEETING_MAX_MINUTES = 30;
+const GENERATED_MEETING_STEP_MINUTES = 5;
+
+const MATCH_ATTENDEE_NAMES = [
+  "Ava Jensen",
+  "Noah Kim",
+  "Mila Novak",
+  "Ethan Brooks",
+  "Lina Meyer",
+  "Omar Haddad",
+  "Zoey Chen",
+  "Theo Martin",
+  "Iris Silva",
+  "Kai Tanaka",
+  "Nora Fischer",
+  "Leo Anders",
+];
+
+const GENERATED_MEETING_TITLES = [
+  "AI-matched hallway sync",
+  "Surprise founder huddle",
+  "Instant peer exchange",
+  "Serendipity roundtable",
+  "Flash networking match",
+];
+
+const GENERATED_MEETING_LOCATIONS = [
+  "Matchmaking lounge",
+  "Lobby pod 3",
+  "Community corner",
+  "Expo cafe",
+  "Green room nook",
+];
+
 function getActivityTimeRange(
   activityStart: Date | null,
-  activity: PredefinedActivity,
+  activity: PredefinedActivity
 ): string | null {
   if (!activityStart) {
     return null;
@@ -78,7 +115,7 @@ function getActivityTimeRange(
 
   return formatEventTimeRange(
     activityStart,
-    addMinutes(activityStart, activity.durationMinutes),
+    addMinutes(activityStart, activity.durationMinutes)
   );
 }
 
@@ -114,6 +151,27 @@ function addMinutes(date: Date, minutes: number): Date {
   return new Date(date.getTime() + minutes * 60 * 1000);
 }
 
+function getRandomInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function pickRandomItem<T>(items: T[]): T {
+  return items[getRandomInt(0, items.length - 1)];
+}
+
+function pickRandomItems<T>(items: T[], count: number): T[] {
+  const pool = [...items];
+  const selected: T[] = [];
+
+  while (selected.length < count && pool.length > 0) {
+    const index = getRandomInt(0, pool.length - 1);
+    const [item] = pool.splice(index, 1);
+    selected.push(item);
+  }
+
+  return selected;
+}
+
 function getDurationMinutes(start: Date | null, end: Date | null) {
   if (!start || !end || end.getTime() <= start.getTime()) {
     return 30;
@@ -125,11 +183,125 @@ function getDurationMinutes(start: Date | null, end: Date | null) {
 function getActivitiesForPicker(
   type: ScheduleEventType,
   shadowMode: boolean,
-  slotDurationMinutes: number,
+  slotDurationMinutes: number
 ) {
   return shadowMode
     ? getActivitiesByType(type)
     : getActivitiesByType(type, slotDurationMinutes);
+}
+
+function createCandidateMeetingSlot(
+  rangeStart: Date,
+  rangeEnd: Date,
+  durationMinutes: number,
+  offsetSteps: number
+) {
+  const candidateStart = addMinutes(
+    rangeStart,
+    offsetSteps * GENERATED_MEETING_STEP_MINUTES
+  );
+  const candidateEnd = addMinutes(candidateStart, durationMinutes);
+
+  if (candidateEnd.getTime() > rangeEnd.getTime()) {
+    return null;
+  }
+
+  return {
+    start: candidateStart,
+    end: candidateEnd,
+  };
+}
+
+function findGeneratedMeetingSlot(
+  rangeStart: Date,
+  rangeEnd: Date,
+  existingEvents: ScheduleEvent[]
+) {
+  const durationOptions = [30, 25, 20].filter(
+    (duration) =>
+      duration >= GENERATED_MEETING_MIN_MINUTES &&
+      duration <= GENERATED_MEETING_MAX_MINUTES
+  );
+
+  for (let attempt = 0; attempt < 48; attempt += 1) {
+    const durationMinutes = getRandomInt(
+      GENERATED_MEETING_MIN_MINUTES,
+      GENERATED_MEETING_MAX_MINUTES
+    );
+    const latestStartMs = rangeEnd.getTime() - durationMinutes * 60 * 1000;
+    const availableSteps = Math.floor(
+      (latestStartMs - rangeStart.getTime()) /
+        (GENERATED_MEETING_STEP_MINUTES * 60 * 1000)
+    );
+
+    if (availableSteps < 0) {
+      continue;
+    }
+
+    const candidate = createCandidateMeetingSlot(
+      rangeStart,
+      rangeEnd,
+      durationMinutes,
+      getRandomInt(0, availableSteps)
+    );
+
+    if (
+      candidate &&
+      getOverlappingEvents(existingEvents, candidate.start, candidate.end)
+        .length === 0
+    ) {
+      return candidate;
+    }
+  }
+
+  for (const durationMinutes of durationOptions) {
+    const latestStartMs = rangeEnd.getTime() - durationMinutes * 60 * 1000;
+    const availableSteps = Math.floor(
+      (latestStartMs - rangeStart.getTime()) /
+        (GENERATED_MEETING_STEP_MINUTES * 60 * 1000)
+    );
+
+    for (let step = 0; step <= availableSteps; step += 1) {
+      const candidate = createCandidateMeetingSlot(
+        rangeStart,
+        rangeEnd,
+        durationMinutes,
+        step
+      );
+
+      if (
+        candidate &&
+        getOverlappingEvents(existingEvents, candidate.start, candidate.end)
+          .length === 0
+      ) {
+        return candidate;
+      }
+    }
+  }
+
+  return null;
+}
+
+function createGeneratedMeetingEvent(
+  rangeStart: Date,
+  rangeEnd: Date,
+  existingEvents: ScheduleEvent[]
+): ScheduleEvent | null {
+  const slot = findGeneratedMeetingSlot(rangeStart, rangeEnd, existingEvents);
+
+  if (!slot) {
+    return null;
+  }
+
+  return {
+    id: crypto.randomUUID(),
+    type: "meeting",
+    title: pickRandomItem(GENERATED_MEETING_TITLES),
+    start: slot.start,
+    end: slot.end,
+    location: pickRandomItem(GENERATED_MEETING_LOCATIONS),
+    attendees: pickRandomItems(MATCH_ATTENDEE_NAMES, getRandomInt(2, 5)),
+  };
 }
 
 export default function ActivityPickerDialog({
@@ -145,6 +317,9 @@ export default function ActivityPickerDialog({
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
+  const [generatingMeeting, setGeneratingMeeting] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const generationTimeoutRef = useRef<number | null>(null);
 
   const shadowWindow = draft?.shadowWindow ?? null;
   const shadowMode = shadowWindow != null;
@@ -167,10 +342,20 @@ export default function ActivityPickerDialog({
       return [];
     }
 
-    return EVENT_TYPE_ORDER.filter(
+    const types = EVENT_TYPE_ORDER.filter(
       (type) =>
         getActivitiesForPicker(type, shadowMode, slotDurationMinutes).length > 0
     );
+
+    return [...types].sort((a, b) => {
+      if (a === "meeting") {
+        return -1;
+      }
+      if (b === "meeting") {
+        return 1;
+      }
+      return 0;
+    });
   }, [shadowMode, slotDurationMinutes, startWithinShadow]);
 
   const filteredActivities = useMemo(() => {
@@ -187,6 +372,11 @@ export default function ActivityPickerDialog({
 
   useEffect(() => {
     if (!open || !draft) {
+      if (generationTimeoutRef.current != null) {
+        window.clearTimeout(generationTimeoutRef.current);
+        generationTimeoutRef.current = null;
+      }
+
       return;
     }
 
@@ -195,10 +385,20 @@ export default function ActivityPickerDialog({
       setStart(new Date(draft.start));
       setEnd(new Date(draft.end));
       setEditingField(null);
+      setGeneratingMeeting(false);
+      setGenerationError(null);
     });
 
     return () => window.cancelAnimationFrame(frame);
   }, [open, draft]);
+
+  useEffect(() => {
+    return () => {
+      if (generationTimeoutRef.current != null) {
+        window.clearTimeout(generationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleTimeFieldClick = (field: Exclude<EditingField, null>) => {
     setEditingField((current) => (current === field ? null : field));
@@ -212,6 +412,48 @@ export default function ActivityPickerDialog({
     const eventEnd = addMinutes(start, activity.durationMinutes);
     onConfirm(createEventFromActivity(activity, start, eventEnd));
     onClose();
+  };
+
+  const handleCloseDialog = () => {
+    if (generationTimeoutRef.current != null) {
+      window.clearTimeout(generationTimeoutRef.current);
+      generationTimeoutRef.current = null;
+    }
+
+    setGeneratingMeeting(false);
+    onClose();
+  };
+
+  const handleGenerateMeeting = () => {
+    if (!start || !end || generatingMeeting) {
+      return;
+    }
+
+    if (generationTimeoutRef.current != null) {
+      window.clearTimeout(generationTimeoutRef.current);
+    }
+
+    setSelectedType(null);
+    setEditingField(null);
+    setGenerationError(null);
+    setGeneratingMeeting(true);
+
+    generationTimeoutRef.current = window.setTimeout(() => {
+      generationTimeoutRef.current = null;
+
+      const meeting = createGeneratedMeetingEvent(start, end, dayEvents);
+
+      if (!meeting) {
+        setGeneratingMeeting(false);
+        setGenerationError(
+          "No clean match found in this window. Try a wider gap."
+        );
+        return;
+      }
+
+      onConfirm(meeting);
+      handleCloseDialog();
+    }, MATCHING_DELAY_MS);
   };
 
   const handleTimeChange = (field: Exclude<EditingField, null>, time: Date) => {
@@ -266,16 +508,40 @@ export default function ActivityPickerDialog({
   }
 
   return (
-    <Dialog title={dialogTitle} onClose={onClose} width={480}>
+    <Dialog title={dialogTitle} onClose={handleCloseDialog} width={480}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          {selectedType ? (
+          {generatingMeeting ? (
+            <div className="activity-picker-matchmaker" role="status">
+              <div
+                className="activity-picker-matchmaker-orb"
+                aria-hidden="true"
+              >
+                <span className="activity-picker-matchmaker-spark activity-picker-matchmaker-spark-one" />
+                <span className="activity-picker-matchmaker-spark activity-picker-matchmaker-spark-two" />
+                <span className="activity-picker-matchmaker-spark activity-picker-matchmaker-spark-three" />
+                <Loader
+                  type="converging-spinner"
+                  size="large"
+                  themeColor="primary"
+                  ariaLabel="Finding your meeting match"
+                />
+              </div>
+              <div className="activity-picker-matchmaker-copy">
+                <p className="activity-picker-matchmaker-eyebrow">
+                  Matching calendars
+                </p>
+                <h3>Finding your perfect room</h3>
+                <p>Scanning nearby attendees, open slots, and lobby energy.</p>
+              </div>
+            </div>
+          ) : selectedType ? (
             <>
               <div className="activity-picker-category-header">
                 <Button
                   type="button"
                   fillMode="flat"
-                  className="activity-picker-back !justify-start !px-0"
+                  className="activity-picker-back justify-start! px-0!"
                   svgIcon={chevronLeftIcon}
                   onClick={handleBackToTypes}
                 >
@@ -285,7 +551,10 @@ export default function ActivityPickerDialog({
                   className={`activity-picker-category-pill activity-picker-category-pill-${selectedType}`}
                 >
                   <span aria-hidden="true">
-                    <SvgIcon icon={EVENT_TYPE_ICONS[selectedType]} size="small" />
+                    <SvgIcon
+                      icon={EVENT_TYPE_ICONS[selectedType]}
+                      size="small"
+                    />
                   </span>
                   {getActivityTypeLabel(selectedType)}
                 </span>
@@ -307,9 +576,9 @@ export default function ActivityPickerDialog({
                           role="listitem"
                           className="activity-picker-card"
                         >
-                          <CardBody className="activity-picker-card-body !py-3">
+                          <CardBody className="activity-picker-card-body py-3!">
                             <div className="activity-picker-card-copy">
-                              <CardTitle className="!text-sm !font-medium">
+                              <CardTitle className="text-sm! font-medium!">
                                 {activity.title}
                               </CardTitle>
                               {timeRange ? (
@@ -317,7 +586,7 @@ export default function ActivityPickerDialog({
                                   {timeRange}
                                 </p>
                               ) : null}
-                              <CardSubtitle className="!text-xs">
+                              <CardSubtitle className="text-xs!">
                                 {getActivitySubtitle(activity)}
                               </CardSubtitle>
                               {overlapWarning ? (
@@ -365,25 +634,50 @@ export default function ActivityPickerDialog({
                     key={type}
                     type="button"
                     className={`activity-picker-type-button activity-picker-type-button-${type}`}
-                    onClick={() => handleTypeSelect(type)}
+                    onClick={
+                      type === "meeting"
+                        ? handleGenerateMeeting
+                        : () => handleTypeSelect(type)
+                    }
                   >
                     <span
                       className="activity-picker-type-icon"
                       aria-hidden="true"
                     >
-                      <SvgIcon icon={EVENT_TYPE_ICONS[type]} size="medium" />
+                      <SvgIcon
+                        icon={
+                          type === "meeting"
+                            ? sparklesIcon
+                            : EVENT_TYPE_ICONS[type]
+                        }
+                        size="medium"
+                      />
                     </span>
                     <span className="activity-picker-type-copy">
                       <span className="activity-picker-type-label">
-                        {getActivityTypeLabel(type)}
+                        {type === "meeting"
+                          ? "Generate meeting"
+                          : getActivityTypeLabel(type)}
                       </span>
+                      {/* {type === "meeting" ? (
+                        <span className="activity-picker-type-hint">
+                          AI-style matchmaker
+                        </span>
+                      ) : null} */}
                     </span>
-                    <span className="activity-picker-type-count">
-                      {count} {count === 1 ? "option" : "options"}
-                    </span>
+                    {type === "meeting" ? null : (
+                      <span className="activity-picker-type-count">
+                        {count} {count === 1 ? "option" : "options"}
+                      </span>
+                    )}
                   </button>
                 );
               })}
+              {generationError ? (
+                <p className="activity-picker-generation-error">
+                  {generationError}
+                </p>
+              ) : null}
               {availableTypes.length === 0 ? (
                 <p className="col-span-2 px-1 py-6 text-center text-sm text-black/55">
                   {emptyTypesMessage}
