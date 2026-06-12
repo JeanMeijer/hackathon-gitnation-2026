@@ -349,70 +349,34 @@
 
   .grid {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(340px, 48dvh) auto;
+    grid-template-rows: minmax(0, 1fr) auto;
     gap: 8px;
-  }
-
-  .meetsBody {
-    display: grid;
-    gap: 8px;
-    padding: 8px 10px;
-    overflow: visible;
   }
 
   .meetsCard {
+    align-self: start;
+    overflow: visible;
+    box-shadow: 0 8px 20px rgba(23, 32, 28, 0.08);
+  }
+
+  .meetsBody {
+    height: auto;
+    gap: 6px;
+    padding: 6px 8px;
     overflow: visible;
   }
 
-  .sectionTitle {
-    flex-shrink: 0;
-    font-size: 0.85rem;
+  .meetsBody > .sectionTitle {
+    font-size: 0.82rem;
   }
 
-  .invitesButton {
-    flex-shrink: 0;
-    min-width: 5.75rem;
-    padding-inline: 0.85rem;
-    font-size: 0.85rem;
-  }
-
-  .invitesButton svg {
-    width: 1.05rem;
-    height: 1.05rem;
+  .meetsBody > .invitesButton,
+  .boothSection {
+    display: none;
   }
 
   .stats {
     min-width: 0;
-    gap: 6px;
-  }
-
-  .statCardBody {
-    padding: 8px 9px;
-    gap: 7px;
-  }
-
-  .statIcon svg {
-    width: 1.05rem;
-    height: 1.05rem;
-  }
-
-  .statValue {
-    font-size: 1.05rem;
-  }
-
-  .statLabel {
-    font-size: 0.78rem;
-  }
-
-  .boothTabs {
-    height: 300px;
-    min-height: 300px;
-  }
-
-  .boothTabs :global(.k-content),
-  .boothTabs :global(.k-tabstrip-content) {
-    height: 252px;
-    min-height: 252px;
   }
 }
 
