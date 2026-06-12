@@ -257,7 +257,14 @@ export default function HomeDashboard() {
     <main className={styles.shell}>
       <div className={styles.wrap}>
         <header className={styles.hero}>
-          <h1 className={styles.title}>Your GitNation day</h1>
+          <img
+            alt=""
+            className={styles.logo}
+            height={48}
+            src="/gitnation-logo.png"
+            width={48}
+          />
+          <h1 className={styles.title}>Your Gitnation Conference</h1>
         </header>
 
         <section className={styles.grid}>
