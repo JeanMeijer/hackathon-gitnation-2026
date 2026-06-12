@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Children,
   useCallback,
   useEffect,
   useMemo,
@@ -15,15 +14,13 @@ import {
   DayView,
   Scheduler,
   SchedulerDateChangeEvent,
-  SchedulerHeader,
-  type SchedulerHeaderProps,
 } from "@progress/kendo-react-scheduler";
 import ActivityPickerDialog, {
   type ActivityPickerDraft,
 } from "@/app/components/activity-picker-dialog";
+import ScheduleDateNavHeader from "@/app/components/schedule-date-nav-header";
 import ScheduleHeader from "@/app/components/schedule-header";
 import { createScheduleItem } from "@/app/components/schedule-item";
-import { createScheduleSlot } from "@/app/components/schedule-slot";
 import {
   clampToConferenceRange,
   CONFERENCE_DATE_RANGE,
@@ -56,13 +53,8 @@ import {
   isViewingToday,
   scrollToCurrentTimeMarkerWhenReady,
 } from "@/lib/schedule/scroll-to-current-time";
+import { computeShadowEvents } from "@/lib/schedule/shadow-events";
 import type { ScheduleEvent } from "@/lib/schedule/types";
-
-function NavigationOnlySchedulerHeader(props: SchedulerHeaderProps) {
-  const navigation = Children.toArray(props.children)[0];
-
-  return <SchedulerHeader {...props}>{navigation}</SchedulerHeader>;
-}
 
 const emptyBookedMeetings: BookedMeeting[] = [];
 const emptyCustomEvents: ScheduleEvent[] = [];
@@ -81,7 +73,12 @@ function getInitialDateFromQuery() {
     : getInitialScheduleDate();
 }
 
-export default function MySchedule() {
+interface MyScheduleProps {
+  variant?: "page" | "embedded";
+}
+
+export default function MySchedule({ variant = "page" }: MyScheduleProps) {
+  const embedded = variant === "embedded";
   const router = useRouter();
   const scheduleRef = useRef<HTMLDivElement>(null);
   const [date, setDate] = useState(() => getInitialDateFromQuery());
@@ -103,12 +100,25 @@ export default function MySchedule() {
   const [pickerDraft, setPickerDraft] = useState<ActivityPickerDraft | null>(
     null
   );
-  const data = useMemo(
+
+  const realEvents = useMemo(
     () =>
       [...baseEvents, ...bookedMeetings, ...customEvents].sort(
         (a, b) => a.start.getTime() - b.start.getTime()
       ),
     [baseEvents, bookedMeetings, customEvents]
+  );
+
+  const shadowEvents = useMemo(
+    () => computeShadowEvents(realEvents, date),
+    [realEvents, date]
+  );
+
+  const data = useMemo(
+    () => [...realEvents, ...shadowEvents].sort(
+      (a, b) => a.start.getTime() - b.start.getTime()
+    ),
+    [realEvents, shadowEvents]
   );
 
   const openPicker = useCallback((draft: ActivityPickerDraft) => {
@@ -124,9 +134,16 @@ export default function MySchedule() {
     });
   }, [date, openPicker]);
 
-  const handleEmptySlotClick = useCallback(
-    (slot: { start: Date; end: Date }) => {
-      openPicker(slot);
+  const handleShadowClick = useCallback(
+    (shadow: { start: Date; end: Date }) => {
+      openPicker({
+        start: new Date(shadow.start),
+        end: new Date(shadow.end),
+        shadowWindow: {
+          start: new Date(shadow.start),
+          end: new Date(shadow.end),
+        },
+      });
     },
     [openPicker]
   );
@@ -163,13 +180,8 @@ export default function MySchedule() {
   );
 
   const itemComponent = useMemo(
-    () => createScheduleItem(handleEventClick),
-    [handleEventClick],
-  );
-
-  const slotComponent = useMemo(
-    () => createScheduleSlot(handleEmptySlotClick),
-    [handleEmptySlotClick]
+    () => createScheduleItem(handleEventClick, handleShadowClick, { variant }),
+    [handleEventClick, handleShadowClick, variant],
   );
 
   const handleDateChange = (event: SchedulerDateChangeEvent) => {
@@ -191,29 +203,34 @@ export default function MySchedule() {
 
   return (
     <>
-      <ScheduleHeader onNewActivity={handleNewActivity} />
+      {!embedded ? <ScheduleHeader onNewActivity={handleNewActivity} /> : null}
       <div
         ref={scheduleRef}
-        className="min-h-0 flex-1 overflow-hidden"
-        style={{ height: "calc(100dvh - 7.5rem)", minHeight: 520 }}
+        className={
+          embedded
+            ? "my-schedule-embed flex min-h-0 flex-1 flex-col overflow-hidden"
+            : "min-h-0 flex-1 overflow-hidden"
+        }
+        style={embedded ? undefined : { height: "calc(100dvh - 7.5rem)", minHeight: 520 }}
       >
         <Scheduler
-          className="my-schedule"
+          className={embedded ? "my-schedule my-schedule-embedded" : "my-schedule"}
           style={{ height: "100%" }}
           date={date}
           data={data}
           defaultView="day"
           editable={false}
-          footer={() => null}
-          header={NavigationOnlySchedulerHeader}
+          footer={ScheduleDateNavHeader}
+          header={() => null}
           item={itemComponent}
-          slot={slotComponent}
           resources={[EVENT_TYPE_RESOURCE]}
           onDateChange={handleDateChange}
         >
           <DayView
             startTime="08:00"
             endTime="20:00"
+            slotDuration={60}
+            slotDivisions={2}
             showWorkHours={false}
             currentTimeMarker={true}
           />
@@ -237,6 +254,7 @@ export default function MySchedule() {
       <ActivityPickerDialog
         open={pickerOpen}
         draft={pickerDraft}
+        existingEvents={realEvents}
         onClose={handleClosePicker}
         onConfirm={handleConfirmActivity}
       />

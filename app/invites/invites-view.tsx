@@ -41,7 +41,7 @@ const emptySentInvites: SentInvite[] = [];
 const emptyBookedMeetings: BookedMeeting[] = [];
 
 function getScheduleHref(date: Date) {
-  return `/schedule?date=${formatScheduleDateParam(date)}`;
+  return `/?date=${formatScheduleDateParam(date)}`;
 }
 
 function addMinutes(date: Date, minutes: number) {
@@ -257,9 +257,12 @@ export default function InvitesView() {
                 Sent invites ({sentInvites.length})
               </h2>
               {sentInvites.length > 0 ? (
-                <div className={styles.inviteList}>
+                <div className={`${styles.inviteList} ${styles.sentInviteList}`}>
                   {sentInvites.map((invite) => (
-                    <article key={invite.id} className={styles.inviteCard}>
+                    <article
+                      key={invite.id}
+                      className={`${styles.inviteCard} ${styles.sentInviteCard}`}
+                    >
                       <div className={styles.inviteTop}>
                         <ProfileAvatar name={invite.name} size="small" />
                         <div className={styles.inviteIdentity}>

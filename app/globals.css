@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --event-type-talk: #1274ac;
+  --event-type-meeting: #3a9b23;
+  --event-type-break: #656565;
+  --event-type-custom: #7630bc;
 }
 
 @theme inline {
@@ -10,13 +14,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -27,6 +24,54 @@ body {
 
 .my-schedule {
   --kendo-scheduler-height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.my-schedule .k-scheduler-layout.k-scheduler-layout-flex {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.my-schedule .k-scheduler-content {
+  overflow-x: hidden;
+}
+
+.my-schedule .k-scheduler-footer {
+  justify-content: center;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.my-schedule .k-scheduler-head {
+  display: none;
+}
+
+.schedule-date-nav {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.schedule-date-nav-group {
+  align-items: center;
+}
+
+.schedule-date-nav-label {
+  min-width: 7.5rem;
+  font-weight: 600;
+  text-transform: none;
 }
 
 .my-schedule .k-event.k-event-past {
@@ -46,12 +91,310 @@ body {
   filter: brightness(1.05);
 }
 
-.my-schedule .schedule-slot-empty {
-  cursor: pointer;
+.my-schedule-embed {
+  background: #fbfcfa;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-.my-schedule .schedule-slot-empty:hover {
-  background-color: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 8%, transparent);
+.my-schedule-embed > .my-schedule,
+.discover-events-schedule-shell > .my-schedule {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.my-schedule-embedded .k-scheduler-footer,
+.my-schedule-embedded .k-scheduler-layout td {
+  border-color: rgba(23, 32, 28, 0.1);
+}
+
+.my-schedule-embedded .k-scheduler-footer {
+  background: #fbfcfa;
+}
+
+.my-schedule-embedded .k-event {
+  border-radius: 8px;
+  border: 3px solid rgba(23, 32, 28, 0.12);
+  background: #fff !important;
+  box-shadow: 0 4px 12px rgba(23, 32, 28, 0.06);
+  color: #17201c;
+  padding: 8px 10px;
+  overflow: hidden;
+}
+
+.my-schedule-embedded .k-event .k-event-template {
+  height: 100%;
+}
+
+.my-schedule-embedded .k-event.schedule-event-clickable:hover {
+  box-shadow: 0 10px 22px rgba(23, 32, 28, 0.1);
+  filter: none;
+  transform: translateY(-1px);
+}
+
+.my-schedule-embedded .schedule-event-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  height: 100%;
+}
+
+.my-schedule-embedded .schedule-event-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.my-schedule-embedded .schedule-event-title {
+  flex: 1;
+  min-width: 0;
+  color: #17201c;
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.my-schedule-embedded .schedule-event-meta {
+  color: #5d665f;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.my-schedule-embedded .schedule-event-type {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: lowercase;
+}
+
+.my-schedule-embedded .schedule-event-type-talk {
+  color: var(--event-type-talk);
+}
+
+.my-schedule-embedded .schedule-event-type-meeting {
+  color: var(--event-type-meeting);
+}
+
+.my-schedule-embedded .schedule-event-type-break {
+  color: var(--event-type-break);
+}
+
+.my-schedule-embedded .schedule-event-type-custom {
+  color: var(--event-type-custom);
+}
+
+.my-schedule-embedded .k-event.schedule-event-shadow,
+.my-schedule .k-event.schedule-event-shadow {
+  border: none;
+  background: transparent !important;
+  box-shadow: none;
+  color: var(--kendo-color-primary, #1274ac);
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.my-schedule-embedded .k-event.schedule-event-shadow .k-event-template,
+.my-schedule .k-event.schedule-event-shadow .k-event-template {
+  height: 100%;
+}
+
+.my-schedule-embedded .k-event.schedule-shadow-clickable:hover,
+.my-schedule .k-event.schedule-shadow-clickable:hover {
+  background: transparent !important;
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+
+.my-schedule-embedded .k-event.schedule-shadow-clickable:hover .schedule-shadow-event,
+.my-schedule .k-event.schedule-shadow-clickable:hover .schedule-shadow-event {
+  background: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 10%, transparent);
+}
+
+.schedule-shadow-event {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  height: 100%;
+  min-height: 3rem;
+  padding: 0.5rem;
+  border: 2px dashed color-mix(in srgb, var(--kendo-color-primary, #1274ac) 35%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 4%, transparent);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.schedule-shadow-event-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--kendo-color-primary, #1274ac);
+}
+
+.schedule-shadow-event-label {
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.2;
+  color: var(--kendo-color-primary, #1274ac);
+}
+
+.activity-picker-overlap-warning {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #b45309;
+}
+
+.activity-picker-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.activity-picker-type-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 4.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.activity-picker-type-button:hover {
+  box-shadow: 0 4px 12px rgba(23, 32, 28, 0.08);
+}
+
+.activity-picker-type-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.activity-picker-type-button-talk,
+.activity-picker-category-pill-talk,
+.event-type-filter-pill-talk {
+  --event-type-color: var(--event-type-talk);
+  color: var(--event-type-talk);
+  border-color: var(--event-type-talk);
+  background-color: color-mix(in srgb, var(--event-type-talk) 10%, transparent);
+}
+
+.activity-picker-type-button-meeting,
+.activity-picker-category-pill-meeting,
+.event-type-filter-pill-meeting {
+  --event-type-color: var(--event-type-meeting);
+  color: var(--event-type-meeting);
+  border-color: var(--event-type-meeting);
+  background-color: color-mix(in srgb, var(--event-type-meeting) 10%, transparent);
+}
+
+.activity-picker-type-button-break,
+.activity-picker-category-pill-break,
+.event-type-filter-pill-break {
+  --event-type-color: var(--event-type-break);
+  color: var(--event-type-break);
+  border-color: var(--event-type-break);
+  background-color: color-mix(in srgb, var(--event-type-break) 10%, transparent);
+}
+
+.activity-picker-type-button-custom,
+.activity-picker-category-pill-custom,
+.event-type-filter-pill-custom {
+  --event-type-color: var(--event-type-custom);
+  color: var(--event-type-custom);
+  border-color: var(--event-type-custom);
+  background-color: color-mix(in srgb, var(--event-type-custom) 10%, transparent);
+}
+
+.activity-picker-type-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  color: inherit;
+  background-color: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.activity-picker-type-icon .k-svg-icon {
+  color: inherit;
+  fill: currentColor;
+}
+
+.activity-picker-type-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-picker-type-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: inherit;
+}
+
+.activity-picker-type-count {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: inherit;
+  opacity: 0.72;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.activity-picker-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.activity-picker-category-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.activity-picker-back {
+  align-self: center;
+  margin-bottom: 0;
 }
 
 .activity-picker-list {
@@ -62,13 +405,36 @@ body {
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
 }
 
+.activity-picker-card-body {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.activity-picker-card-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-picker-card-time {
+  margin: 0.15rem 0 0.1rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.3;
+  color: #17201c;
+}
+
+.activity-picker-card-add {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 .activity-picker-card:focus-visible {
   outline: 2px solid var(--kendo-color-primary, #1274ac);
   outline-offset: 2px;
-}
-
-.activity-picker-card-selected {
-  background-color: color-mix(in srgb, var(--kendo-color-primary, #1274ac) 6%, transparent);
 }
 
 .activity-time-editor {
@@ -80,4 +446,185 @@ body {
 .activity-time-editor .k-time-selector {
   width: 100%;
   max-width: 16rem;
+}
+
+.event-map-dialog.k-dialog-wrapper .k-dialog {
+  max-width: calc(100vw - 2rem);
+  height: min(90dvh, 90vh) !important;
+  max-height: min(90dvh, 90vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.event-map-dialog.k-dialog-wrapper .k-dialog-content {
+  overflow: hidden;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-map-dialog__map-shell {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.event-map-dialog__map,
+.event-map-dialog__map > .k-map {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  overflow: hidden !important;
+  box-sizing: border-box;
+  touch-action: none;
+}
+
+.event-map-dialog__map .k-map > div {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.event-map-dialog__map .k-marker:has(.event-map-marker-dot) {
+  transform: translate(-50%, -50%);
+}
+
+.event-map-marker-dot {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #b71c1c;
+  box-shadow: 0 0 0 2px #fff, 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.discover-shell {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.discover-tabstrip.k-tabstrip {
+  border: none;
+  background: transparent;
+}
+
+.discover-tabstrip .k-tabstrip-content {
+  display: none;
+}
+
+.discover-tabstrip .k-tabstrip-items-wrapper {
+  border-bottom: none;
+}
+
+.discover-tabstrip .k-tabstrip-item .k-link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding-block: 0.85rem;
+}
+
+.discover-events-filters {
+  background: #fbfcfa;
+}
+
+.event-type-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--event-type-color);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--event-type-color);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.event-type-filter-pill:focus-visible {
+  outline: 2px solid var(--event-type-color);
+  outline-offset: 2px;
+}
+
+.event-type-filter-pill-active {
+  background-color: color-mix(in srgb, var(--event-type-color) 18%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--event-type-color) 20%, transparent);
+}
+
+.event-type-filter-pill-inactive {
+  background-color: color-mix(in srgb, var(--event-type-color) 6%, transparent);
+  opacity: 0.55;
+}
+
+.discover-events-schedule-shell {
+  background: #fbfcfa;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.schedule-event-badges {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.schedule-event-joined-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--event-type-talk) 14%, white);
+  color: var(--event-type-talk);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.my-schedule-embedded .k-event.schedule-event-joined {
+  box-shadow:
+    0 4px 12px rgba(23, 32, 28, 0.06),
+    inset 0 0 0 2px color-mix(in srgb, var(--event-type-talk) 45%, transparent);
+}
+
+.event-type-label-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.event-type-label-pill-talk {
+  color: var(--event-type-talk);
+}
+
+.event-type-label-pill-meeting {
+  color: var(--event-type-meeting);
+}
+
+.event-type-label-pill-break {
+  color: var(--event-type-break);
+}
+
+.event-type-label-pill-custom {
+  color: var(--event-type-custom);
 }

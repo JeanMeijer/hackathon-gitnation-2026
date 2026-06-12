@@ -1,8 +1,17 @@
-import type { Metadata } from "next";
-import SchedulePage from "@/app/components/schedule-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "My Schedule",
+type ScheduleRedirectProps = {
+  searchParams: Promise<{ date?: string }>;
 };
 
-export default SchedulePage;
+export default async function ScheduleRedirect({
+  searchParams,
+}: ScheduleRedirectProps) {
+  const params = await searchParams;
+
+  if (params.date) {
+    redirect(`/?date=${encodeURIComponent(params.date)}`);
+  }
+
+  redirect("/");
+}

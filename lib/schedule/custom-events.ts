@@ -68,7 +68,22 @@ export function getCustomScheduleEvents() {
 }
 
 export function addCustomScheduleEvent(event: ScheduleEvent) {
-  return writeEvents([...getCustomScheduleEvents(), event]);
+  const existing = getCustomScheduleEvents();
+  if (existing.some((item) => item.id === event.id)) {
+    return existing;
+  }
+
+  return writeEvents([...existing, event]);
+}
+
+export function removeCustomScheduleEvent(eventId: string) {
+  return writeEvents(
+    getCustomScheduleEvents().filter((event) => event.id !== eventId),
+  );
+}
+
+export function isScheduleEventJoined(eventId: string) {
+  return getCustomScheduleEvents().some((event) => event.id === eventId);
 }
 
 export function clearCustomScheduleEvents() {

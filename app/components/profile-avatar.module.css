@@ -11,10 +11,18 @@
   --avatar-highlight-stop: 8px;
 
   position: relative;
+  flex: 0 0 var(--avatar-size);
   overflow: hidden;
+  box-sizing: border-box;
   width: var(--avatar-size);
   height: var(--avatar-size);
+  min-width: var(--avatar-size);
+  max-width: var(--avatar-size);
+  min-height: var(--avatar-size);
+  max-height: var(--avatar-size);
+  aspect-ratio: 1 / 1;
   border: 3px solid var(--avatar-accent);
+  border-radius: 999px !important;
   background:
     radial-gradient(
       circle at 72% 22%,

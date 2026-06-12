@@ -1,8 +1,7 @@
-import type {
-  MeetingScheduleEvent,
-  ConferenceDateRange,
-  ScheduleEvent,
-} from "./types";
+import type { MeetingScheduleEvent, ConferenceDateRange } from "./types";
+
+/** Anything with a time span — real schedule events or shadow placeholders. */
+type TimeBoundedEvent = { start: Date; end: Date };
 
 /** Pool of fake handles for demo-generated meetups. */
 const FAKE_NICKS = [
@@ -61,7 +60,7 @@ function pickSome<T>(items: readonly T[], count: number): T[] {
 
 /** Existing events on the conference day, as time intervals. */
 function busyIntervalsForDay(
-  events: ScheduleEvent[],
+  events: TimeBoundedEvent[],
   day: Date,
 ): Interval[] {
   return events
@@ -88,7 +87,7 @@ function busyIntervalsForDay(
 export function generateMeetups(
   interests: string[],
   range: ConferenceDateRange,
-  existingEvents: ScheduleEvent[] = [],
+  existingEvents: TimeBoundedEvent[] = [],
 ): MeetingScheduleEvent[] {
   const usableInterests = interests.length > 0 ? interests : ["Networking"];
   const count = 3 + Math.floor(Math.random() * 3); // 3..5
