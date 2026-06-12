@@ -602,6 +602,69 @@ body {
   letter-spacing: 0.02em;
 }
 
+.schedule-event-joined-badge,
+.event-details-joined-badge {
+  gap: 0.25rem;
+}
+
+.joined-badge-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.event-details-joined-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--event-type-talk) 14%, white);
+  color: var(--event-type-talk);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.event-details-card {
+  position: relative;
+}
+
+.event-details-joined-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  padding: 0.125rem;
+}
+
+.event-details-unregister-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.55);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.event-details-unregister-btn:hover {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.event-details-unregister-btn:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.35);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .my-schedule-embedded .k-event.schedule-event-joined {
   box-shadow:
     0 4px 12px rgba(23, 32, 28, 0.06),

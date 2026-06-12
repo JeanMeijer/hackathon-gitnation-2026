@@ -43,6 +43,10 @@ import {
 import { MOCK_USER_SCHEDULE } from "@/lib/schedule/mock-events";
 import { EVENT_TYPE_RESOURCE } from "@/lib/schedule/resources";
 import {
+  getRemovedScheduleEventIds,
+  subscribeToRemovedScheduleEvents,
+} from "@/lib/schedule/removed-schedule-events";
+import {
   isViewingToday,
   scrollToCurrentTimeMarkerWhenReady,
 } from "@/lib/schedule/scroll-to-current-time";
@@ -75,9 +79,17 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
   const router = useRouter();
   const scheduleRef = useRef<HTMLDivElement>(null);
   const [date, setDate] = useState(() => getInitialDateFromQuery());
+  const removedEventIds = useSyncExternalStore(
+    subscribeToRemovedScheduleEvents,
+    getRemovedScheduleEventIds,
+    () => new Set<string>(),
+  );
   const baseEvents = useMemo(
-    () => createInitialScheduleEvents(MOCK_USER_SCHEDULE),
-    []
+    () =>
+      createInitialScheduleEvents(
+        MOCK_USER_SCHEDULE.filter((event) => !removedEventIds.has(event.id)),
+      ),
+    [removedEventIds],
   );
   const bookedMeetings = useSyncExternalStore(
     subscribeToBookedMeetings,

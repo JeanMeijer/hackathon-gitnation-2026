@@ -84,6 +84,7 @@ export default function DiscoverEvents() {
       createScheduleItem(handleEventClick, () => {}, {
         variant: "embedded",
         joinedEventIds,
+        showJoinedBadge: true,
       }),
     [handleEventClick, joinedEventIds],
   );

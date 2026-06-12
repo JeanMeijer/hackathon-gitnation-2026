@@ -6,6 +6,7 @@ import {
   type SchedulerItemProps,
 } from "@progress/kendo-react-scheduler";
 import { plusIcon } from "@progress/kendo-svg-icons";
+import JoinedBadge from "@/app/components/joined-badge";
 import {
   formatEventStartTime,
   getEventLocationLabel,
@@ -60,9 +61,7 @@ function EmbeddedScheduleEventContent({
         <div className="schedule-event-title">{title}</div>
         <span className="schedule-event-badges">
           {joined ? (
-            <span className="schedule-event-joined-badge" aria-label="Joined">
-              Joined
-            </span>
+            <JoinedBadge className="schedule-event-joined-badge" />
           ) : null}
           <span
             className={`schedule-event-type schedule-event-type-${event.type}`}
@@ -88,6 +87,7 @@ function ShadowScheduleEventContent() {
 interface CreateScheduleItemOptions {
   variant?: "page" | "embedded";
   joinedEventIds?: Set<string>;
+  showJoinedBadge?: boolean;
 }
 
 export function createScheduleItem(
@@ -97,13 +97,16 @@ export function createScheduleItem(
 ) {
   const embedded = options.variant === "embedded";
   const joinedEventIds = options.joinedEventIds;
+  const showJoinedBadge = options.showJoinedBadge ?? false;
 
   return function ScheduleItem(props: SchedulerItemProps) {
     const shadow = isShadowScheduleEvent(props.dataItem);
     const past = !shadow && isPastEvent(props.end);
     const eventId =
       props.dataItem?.id != null ? String(props.dataItem.id) : undefined;
-    const joined = Boolean(eventId && joinedEventIds?.has(eventId));
+    const joined = Boolean(
+      showJoinedBadge && eventId && joinedEventIds?.has(eventId),
+    );
     const className = [
       props.className,
       shadow ? "schedule-event-shadow" : undefined,
