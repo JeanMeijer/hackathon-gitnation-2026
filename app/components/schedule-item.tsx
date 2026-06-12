@@ -101,6 +101,7 @@ export function createScheduleItem(
 
   return function ScheduleItem(props: SchedulerItemProps) {
     const shadow = isShadowScheduleEvent(props.dataItem);
+    const generated = props.dataItem?.generated === true;
     const past = !shadow && isPastEvent(props.end);
     const eventId =
       props.dataItem?.id != null ? String(props.dataItem.id) : undefined;
@@ -111,7 +112,11 @@ export function createScheduleItem(
       props.className,
       shadow ? "schedule-event-shadow" : undefined,
       past ? "k-event-past" : undefined,
-      shadow ? "schedule-shadow-clickable" : "schedule-event-clickable",
+      shadow
+        ? "schedule-shadow-clickable"
+        : generated
+          ? undefined
+          : "schedule-event-clickable",
       embedded && !shadow ? "schedule-event-embedded" : undefined,
       joined ? "schedule-event-joined" : undefined,
     ]
@@ -119,6 +124,10 @@ export function createScheduleItem(
       .join(" ");
 
     const handleClick: SchedulerItemProps["onClick"] = (event) => {
+      if (generated) {
+        return;
+      }
+
       props.onClick?.(event);
 
       if (shadow) {
@@ -140,14 +149,11 @@ export function createScheduleItem(
         {...props}
         title={shadow ? SHADOW_EVENT_TITLE : props.title}
         className={className}
-        style={
-          past
-            ? {
-                ...props.style,
-                opacity: 0.55,
-              }
-            : props.style
-        }
+        style={{
+          ...props.style,
+          ...(past ? { opacity: 0.55 } : null),
+          ...(generated ? { cursor: "default" } : null),
+        }}
         onClick={handleClick}
       >
         {shadow ? (

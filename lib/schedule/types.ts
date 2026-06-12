@@ -23,6 +23,8 @@ export interface MeetingScheduleEvent extends ScheduleEventBase {
   type: "meeting";
   location?: string;
   attendees?: string[];
+  /** Marks demo-generated meetups, which are not clickable. */
+  generated?: boolean;
 }
 
 export interface BreakScheduleEvent extends ScheduleEventBase {
