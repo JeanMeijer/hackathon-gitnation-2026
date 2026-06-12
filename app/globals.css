@@ -264,11 +264,18 @@ body {
 
 .activity-picker-type-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.75rem;
 }
 
+@media (min-width: 480px) {
+  .activity-picker-type-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .activity-picker-type-button {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -282,13 +289,19 @@ body {
   text-align: left;
   cursor: pointer;
   font: inherit;
+  overflow: hidden;
   transition:
     background-color 0.15s ease,
-    box-shadow 0.15s ease;
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .activity-picker-type-button:hover {
   box-shadow: 0 4px 12px rgba(23, 32, 28, 0.08);
+}
+
+.activity-picker-type-button:active {
+  transform: translateY(1px);
 }
 
 .activity-picker-type-button:focus-visible {
@@ -312,6 +325,52 @@ body {
   color: var(--event-type-meeting);
   border-color: var(--event-type-meeting);
   background-color: color-mix(in srgb, var(--event-type-meeting) 10%, transparent);
+}
+
+.activity-picker-type-button-meeting {
+  color: #fff;
+  border: 0;
+  background:
+    radial-gradient(circle at 18% 15%, rgba(255, 255, 255, 0.52), transparent 26%),
+    linear-gradient(135deg, #0f9b8e 0%, #3a9b23 42%, #b9f45f 100%);
+  box-shadow:
+    0 12px 28px rgba(58, 155, 35, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+.activity-picker-type-button-meeting::before {
+  position: absolute;
+  inset: -50% auto auto -25%;
+  width: 45%;
+  height: 200%;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.42),
+    transparent
+  );
+  transform: rotate(18deg);
+  animation: activity-picker-shine 3s ease-in-out infinite;
+}
+
+.activity-picker-type-button-meeting > span {
+  position: relative;
+  z-index: 1;
+}
+
+.activity-picker-type-button-meeting:hover {
+  box-shadow:
+    0 18px 38px rgba(58, 155, 35, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.34) inset;
+  transform: translateY(-1px);
+}
+
+.activity-picker-type-button-meeting .activity-picker-type-icon {
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 22px rgba(255, 255, 255, 0.28);
 }
 
 .activity-picker-type-button-break,
@@ -355,10 +414,21 @@ body {
 }
 
 .activity-picker-type-label {
+  display: block;
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.25;
   color: inherit;
+}
+
+.activity-picker-type-hint {
+  display: block;
+  margin-top: 0.2rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .activity-picker-type-count {
@@ -370,6 +440,158 @@ body {
   opacity: 0.72;
   text-align: right;
   white-space: nowrap;
+}
+
+.activity-picker-generation-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(180, 83, 9, 0.24);
+  border-radius: 8px;
+  background: rgba(251, 191, 36, 0.12);
+  color: #92400e;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.activity-picker-matchmaker {
+  position: relative;
+  min-height: 18rem;
+  padding: 2rem 1.25rem;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(185, 244, 95, 0.38), transparent 28%),
+    radial-gradient(circle at 12% 82%, rgba(15, 155, 142, 0.24), transparent 30%),
+    linear-gradient(145deg, #071f1a 0%, #173820 54%, #3a9b23 130%);
+  color: #fff;
+  overflow: hidden;
+  text-align: center;
+  box-shadow: 0 22px 48px rgba(23, 32, 28, 0.22);
+}
+
+.activity-picker-matchmaker::before,
+.activity-picker-matchmaker::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.activity-picker-matchmaker::before {
+  inset: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 40px rgba(185, 244, 95, 0.1);
+}
+
+.activity-picker-matchmaker::after {
+  width: 9rem;
+  height: 9rem;
+  right: -3rem;
+  bottom: -3rem;
+  background: rgba(185, 244, 95, 0.2);
+  filter: blur(2px);
+}
+
+.activity-picker-matchmaker-orb {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 7rem;
+  height: 7rem;
+  margin-bottom: 1.25rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent 58%),
+    rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.18) inset,
+    0 0 48px rgba(185, 244, 95, 0.42);
+}
+
+.activity-picker-matchmaker-orb .k-loader {
+  color: #fff;
+}
+
+.activity-picker-matchmaker-spark {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #d7ff87;
+  box-shadow: 0 0 18px #d7ff87;
+  animation: activity-picker-float 2.4s ease-in-out infinite;
+}
+
+.activity-picker-matchmaker-spark-one {
+  top: 0.65rem;
+  right: 1.3rem;
+}
+
+.activity-picker-matchmaker-spark-two {
+  bottom: 1rem;
+  left: 1rem;
+  animation-delay: 0.35s;
+}
+
+.activity-picker-matchmaker-spark-three {
+  top: 50%;
+  left: -0.2rem;
+  animation-delay: 0.7s;
+}
+
+.activity-picker-matchmaker-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.activity-picker-matchmaker-copy h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.activity-picker-matchmaker-copy p {
+  margin: 0.65rem auto 0;
+  max-width: 18rem;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.activity-picker-matchmaker-copy .activity-picker-matchmaker-eyebrow {
+  margin: 0 0 0.45rem;
+  color: #d7ff87;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@keyframes activity-picker-shine {
+  0% {
+    transform: translateX(0) rotate(18deg);
+  }
+  42%,
+  100% {
+    transform: translateX(330%) rotate(18deg);
+  }
+}
+
+@keyframes activity-picker-float {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translateY(0) scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-0.55rem) scale(1);
+  }
 }
 
 .activity-picker-category-header {

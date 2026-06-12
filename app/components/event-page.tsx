@@ -4,14 +4,17 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
 import { Button } from "@progress/kendo-react-buttons";
-import { Card, CardBody, CardSubtitle, CardTitle } from "@progress/kendo-react-layout";
+import { Card, CardBody } from "@progress/kendo-react-layout";
 import { chevronLeftIcon, directionsIcon } from "@progress/kendo-svg-icons";
 import EventMapDialog from "@/app/components/event-map-dialog";
 import JoinedBadge from "@/app/components/joined-badge";
+import ProfileAvatar from "@/app/components/profile-avatar";
+import styles from "@/app/components/event-page.module.css";
 import {
   defaultUserProfile,
   getProfileSnapshot,
   subscribeToProfile,
+  type UserProfile,
 } from "@/app/profile/profile-data";
 import {
   addCustomScheduleEvent,
@@ -33,6 +36,7 @@ import {
   isConferenceEvent,
 } from "@/lib/schedule/event-lookup";
 import { getEventTypeThemeClass } from "@/lib/schedule/event-type-theme";
+import { getLobbyAttendeeProfile } from "@/lib/schedule/lobby-attendee-profile";
 import type { ScheduleEvent } from "@/lib/schedule/types";
 
 interface EventPageProps {
@@ -148,42 +152,48 @@ function EventDetails({
 
 function EventLobby({
   event,
-  currentUserName,
+  currentUser,
 }: {
   event: ScheduleEvent;
-  currentUserName: string;
+  currentUser: UserProfile;
 }) {
   const otherAttendees = getEventLobbyAttendeeNames(event).filter(
-    (name) => name.trim().toLowerCase() !== currentUserName.trim().toLowerCase(),
+    (name) =>
+      name.trim().toLowerCase() !== currentUser.name.trim().toLowerCase(),
   );
 
   return (
-    <section aria-labelledby="event-lobby" className="flex flex-col gap-3">
-      <h2 id="event-lobby" className="text-lg font-semibold">
+    <section aria-labelledby="event-lobby" className={styles.lobby}>
+      <h2 id="event-lobby" className={styles.lobbyTitle}>
         Lobby
       </h2>
 
-      <ul className="flex flex-wrap gap-2">
+      <ul className={styles.lobbyList}>
         <li>
-          <Card className="w-fit border border-black/8">
-            <CardBody className="px-3 py-2">
-              <CardTitle className="text-sm font-medium">
-                {currentUserName}
-              </CardTitle>
-              <CardSubtitle className="text-xs text-black/55">You</CardSubtitle>
-            </CardBody>
-          </Card>
+          <article className={styles.lobbyCard}>
+            <ProfileAvatar name={currentUser.name} size="small" />
+            <div className={styles.lobbyIdentity}>
+              <p className={styles.lobbyName}>{currentUser.name}</p>
+              <p className={styles.lobbyRole}>{currentUser.title}</p>
+            </div>
+          </article>
         </li>
 
-        {otherAttendees.map((name) => (
-          <li key={name}>
-            <Card className="w-fit border border-black/8">
-              <CardBody className="px-3 py-2">
-                <CardTitle className="text-sm font-medium">{name}</CardTitle>
-              </CardBody>
-            </Card>
-          </li>
-        ))}
+        {otherAttendees.map((name) => {
+          const attendee = getLobbyAttendeeProfile(name);
+
+          return (
+            <li key={name}>
+              <article className={styles.lobbyCard}>
+                <ProfileAvatar name={attendee.name} size="small" />
+                <div className={styles.lobbyIdentity}>
+                  <p className={styles.lobbyName}>{attendee.name}</p>
+                  <p className={styles.lobbyRole}>{attendee.title}</p>
+                </div>
+              </article>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
@@ -323,7 +333,7 @@ export default function EventPage({ eventId }: EventPageProps) {
           />
         </div>
 
-        <EventLobby event={event} currentUserName={profile.name} />
+        <EventLobby event={event} currentUser={profile} />
       </div>
 
       <EventJoinAction

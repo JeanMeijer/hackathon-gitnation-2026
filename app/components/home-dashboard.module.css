@@ -23,12 +23,21 @@
 
 .hero {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  flex-shrink: 0;
+  width: clamp(36px, 8vw, 48px);
+  height: auto;
 }
 
 .title {
   margin: 0;
   color: #17201c;
-  font-size: clamp(1.35rem, 3.5vw, 2.55rem);
+  font-size: clamp(1.55rem, 4.25vw, 3rem);
   font-weight: 790;
   line-height: 1.05;
 }
@@ -337,10 +346,6 @@
 
   .hero {
     margin-bottom: -2px;
-  }
-
-  .title {
-    font-size: 1.1rem;
   }
 
   .wrap {
