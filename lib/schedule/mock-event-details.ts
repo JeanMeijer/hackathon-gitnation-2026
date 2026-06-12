@@ -37,8 +37,9 @@ export const MOCK_EVENT_DETAILS: Record<string, MockEventDetails> = {
     ],
   },
   "5": {
-    description: "Informal Q&A over food with conference mentors.",
-    attendees: [{ name: "Mentor Ana" }, { name: "Mentor David" }],
+    description:
+      "Solve layout puzzles with grid, subgrid, and one suspicious fr unit. Bring your laptop and a sense of adventure.",
+    attendees: [{ name: "Layout Wizard" }, { name: "Grid Enthusiast" }],
   },
   "6": {
     description:
@@ -103,13 +104,25 @@ export const MOCK_EVENT_DETAILS: Record<string, MockEventDetails> = {
       { name: "Yuki Tanaka" },
     ],
   },
-  "conf-custom-workshop": {
-    description: "Bring your laptop — hands-on exercises building a full-stack React app.",
-    attendees: [{ name: "Workshop host" }],
+  "conf-workshop-rsc": {
+    description:
+      "Bring your laptop — wire up streaming, data fetching, and a client boundary that actually makes sense.",
+    attendees: [{ name: "RSC Host" }, { name: "Streaming Stan" }],
   },
-  "conf-custom-lunch-mentors": {
-    description: "Informal Q&A over food with conference mentors.",
-    attendees: [{ name: "Mentor Ana" }, { name: "Mentor David" }],
+  "conf-workshop-css-grid": {
+    description:
+      "Solve layout puzzles with grid, subgrid, and one suspicious fr unit. No floats allowed.",
+    attendees: [{ name: "Layout Wizard" }, { name: "Grid Enthusiast" }],
+  },
+  "conf-workshop-edge-functions": {
+    description:
+      "Deploy a tiny API that runs closer to your users. We'll cover cold starts, routing, and why edge is not just a buzzword.",
+    attendees: [{ name: "Edge Evangelist" }],
+  },
+  "conf-workshop-devtools": {
+    description:
+      "Profile renders, inspect component trees, and finally find who keeps re-rendering the sidebar.",
+    attendees: [{ name: "DevTools Detective" }],
   },
   "conf-talk-keynote-closing": {
     description: "Closing remarks and highlights from GitNation 2026.",

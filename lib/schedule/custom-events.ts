@@ -8,11 +8,17 @@ let cachedRawEvents: string | null | undefined;
 let cachedEvents: ScheduleEvent[] | undefined;
 
 function reviveEvent(event: ScheduleEvent): ScheduleEvent {
-  return {
+  const revived = {
     ...event,
     start: new Date(event.start),
     end: new Date(event.end),
   };
+
+  if ((revived as { type: string }).type === "custom") {
+    return { ...revived, type: "workshop" } as ScheduleEvent;
+  }
+
+  return revived;
 }
 
 function isValidEvent(event: ScheduleEvent) {

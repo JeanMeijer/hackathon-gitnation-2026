@@ -15,7 +15,7 @@ function cloneEventDates(events: ScheduleEvent[]): ScheduleEvent[] {
 function isScheduleEventType(value: unknown): value is ScheduleEventType {
   return (
     value === "talk" ||
-    value === "custom" ||
+    value === "workshop" ||
     value === "meeting" ||
     value === "break"
   );
@@ -54,13 +54,13 @@ export function createDefaultEventDraft(viewedDate: Date): DataItem {
     title: "",
     start,
     end,
-    type: "custom",
+    type: "workshop",
     isAllDay: false,
   };
 }
 
 function normalizeCreatedEvent(item: DataItem): ScheduleEvent {
-  const type = isScheduleEventType(item.type) ? item.type : "custom";
+  const type = isScheduleEventType(item.type) ? item.type : "workshop";
   const id = item.id != null ? String(item.id) : crypto.randomUUID();
   const title = typeof item.title === "string" ? item.title : "Untitled";
   const start = new Date(item.start);
@@ -104,7 +104,7 @@ function normalizeCreatedEvent(item: DataItem): ScheduleEvent {
     default:
       return {
         id,
-        type: "custom",
+        type: "workshop",
         title,
         start,
         end,

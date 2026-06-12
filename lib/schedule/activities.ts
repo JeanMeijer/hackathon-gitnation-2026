@@ -109,33 +109,35 @@ export const PREDEFINED_ACTIVITIES: PredefinedActivity[] = [
     location: "Community area",
   },
   {
-    id: "custom-lunch-mentors",
-    type: "custom",
-    title: "Lunch with mentors",
+    id: "workshop-css-grid",
+    type: "workshop",
+    title: "CSS Grid Escape Room",
     durationMinutes: 60,
-    description: "Informal Q&A over food",
-    location: "Restaurant district",
+    description: "Solve layout puzzles with grid, subgrid, and one suspicious fr unit.",
+    location: "Studio A",
   },
   {
-    id: "custom-expo",
-    type: "custom",
-    title: "Expo hall visit",
+    id: "workshop-edge-functions",
+    type: "workshop",
+    title: "Edge Functions in 45 Minutes",
     durationMinutes: 45,
-    location: "Expo hall",
+    description: "Deploy a tiny API that runs closer to your users. Node, Deno, or Bun — pick your poison.",
+    location: "Lab 2",
   },
   {
-    id: "custom-networking",
-    type: "custom",
-    title: "Open networking",
+    id: "workshop-devtools",
+    type: "workshop",
+    title: "React DevTools Detective Hour",
     durationMinutes: 30,
-    location: "Community area",
+    description: "Profile renders and hunt down whoever keeps re-rendering the sidebar.",
+    location: "Studio B",
   },
   {
-    id: "custom-workshop",
-    type: "custom",
-    title: "Hands-on React workshop",
+    id: "workshop-rsc",
+    type: "workshop",
+    title: "Build Your First Server Component",
     durationMinutes: 90,
-    description: "Bring your laptop",
+    description: "Bring your laptop — wire up streaming, data fetching, and a client boundary that makes sense.",
     location: "Workshop room",
   },
 ];
@@ -160,8 +162,8 @@ export function getActivityTypeLabel(type: ScheduleEventType): string {
       return "Meeting";
     case "break":
       return "Break";
-    case "custom":
-      return "Custom";
+    case "workshop":
+      return "Workshop";
   }
 }
 
@@ -201,10 +203,10 @@ export function createEventFromActivity(
         end,
         location: activity.location,
       };
-    case "custom":
+    case "workshop":
       return {
         id,
-        type: "custom",
+        type: "workshop",
         title: activity.title,
         start,
         end,

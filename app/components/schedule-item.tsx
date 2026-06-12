@@ -24,7 +24,7 @@ function isPastEvent(end: Date, now: number = Date.now()): boolean {
 function isScheduleEventType(value: unknown): value is ScheduleEventType {
   return (
     value === "talk" ||
-    value === "custom" ||
+    value === "workshop" ||
     value === "meeting" ||
     value === "break"
   );
