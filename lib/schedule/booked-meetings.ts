@@ -16,6 +16,7 @@ export type BookMeetingInput = {
 
 const bookedMeetingsStorageKey = "gitnation-booked-meetings";
 const bookedMeetingsEventName = "gitnation-booked-meetings-updated";
+const emptyBookedMeetings: BookedMeeting[] = [];
 
 let cachedRawMeetings: string | null | undefined;
 let cachedMeetings: BookedMeeting[] | undefined;
@@ -34,27 +35,27 @@ function serializeMeetings(meetings: BookedMeeting[]) {
 
 export function getBookedMeetings() {
   if (typeof window === "undefined") {
-    return [];
+    return emptyBookedMeetings;
   }
 
   const rawMeetings = window.localStorage.getItem(bookedMeetingsStorageKey);
 
   if (rawMeetings === cachedRawMeetings) {
-    return cachedMeetings ?? [];
+    return cachedMeetings ?? emptyBookedMeetings;
   }
 
   cachedRawMeetings = rawMeetings;
 
   if (!rawMeetings) {
-    cachedMeetings = [];
-    return [];
+    cachedMeetings = emptyBookedMeetings;
+    return cachedMeetings;
   }
 
   try {
     const parsedMeetings = JSON.parse(rawMeetings) as BookedMeeting[];
     cachedMeetings = parsedMeetings.map(reviveMeeting);
   } catch {
-    cachedMeetings = [];
+    cachedMeetings = emptyBookedMeetings;
   }
 
   return cachedMeetings;
