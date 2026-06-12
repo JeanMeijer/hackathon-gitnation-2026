@@ -66,31 +66,33 @@ export const receivedInvites: ReceivedInvite[] = [
   },
 ];
 
+const emptySentInvites: SentInvite[] = [];
+
 let cachedRawSentInvites: string | null | undefined;
 let cachedSentInvites: SentInvite[] | undefined;
 
 export function getSentInvites() {
   if (typeof window === "undefined") {
-    return [];
+    return emptySentInvites;
   }
 
   const rawInvites = window.localStorage.getItem(sentInvitesStorageKey);
 
   if (rawInvites === cachedRawSentInvites) {
-    return cachedSentInvites ?? [];
+    return cachedSentInvites ?? emptySentInvites;
   }
 
   cachedRawSentInvites = rawInvites;
 
   if (!rawInvites) {
-    cachedSentInvites = [];
-    return [];
+    cachedSentInvites = emptySentInvites;
+    return cachedSentInvites;
   }
 
   try {
     cachedSentInvites = JSON.parse(rawInvites) as SentInvite[];
   } catch {
-    cachedSentInvites = [];
+    cachedSentInvites = emptySentInvites;
   }
 
   return cachedSentInvites;

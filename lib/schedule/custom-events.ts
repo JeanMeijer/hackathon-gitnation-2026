@@ -2,6 +2,7 @@ import type { ScheduleEvent } from "./types";
 
 const customEventsStorageKey = "gitnation-custom-schedule-events";
 const customEventsEventName = "gitnation-custom-schedule-events-updated";
+const emptyCustomEvents: ScheduleEvent[] = [];
 
 let cachedRawEvents: string | null | undefined;
 let cachedEvents: ScheduleEvent[] | undefined;
@@ -41,27 +42,27 @@ function writeEvents(events: ScheduleEvent[]) {
 
 export function getCustomScheduleEvents() {
   if (typeof window === "undefined") {
-    return [];
+    return emptyCustomEvents;
   }
 
   const rawEvents = window.localStorage.getItem(customEventsStorageKey);
 
   if (rawEvents === cachedRawEvents) {
-    return cachedEvents ?? [];
+    return cachedEvents ?? emptyCustomEvents;
   }
 
   cachedRawEvents = rawEvents;
 
   if (!rawEvents) {
-    cachedEvents = [];
-    return [];
+    cachedEvents = emptyCustomEvents;
+    return cachedEvents;
   }
 
   try {
     const parsedEvents = JSON.parse(rawEvents) as ScheduleEvent[];
     cachedEvents = parsedEvents.map(reviveEvent).filter(isValidEvent);
   } catch {
-    cachedEvents = [];
+    cachedEvents = emptyCustomEvents;
   }
 
   return cachedEvents;

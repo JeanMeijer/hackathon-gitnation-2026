@@ -155,31 +155,10 @@
 @media (max-width: 980px) {
   .content {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(24rem, 1fr) minmax(18rem, 22rem);
+    grid-template-rows: minmax(0, 1fr);
   }
 
   .cardsPanel {
-    border-top: 1px solid rgba(23, 32, 28, 0.1);
-    border-left: 0;
-  }
-
-  .eventList {
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    overflow-y: auto;
-  }
-}
-
-@media (max-width: 520px) {
-  .content {
-    grid-template-rows: minmax(22rem, 1fr) minmax(18rem, 21rem);
-  }
-
-  .cardsHeader,
-  .eventList {
-    padding-inline: 0.75rem;
-  }
-
-  .eventCardActions {
-    grid-template-columns: 1fr;
+    display: none;
   }
 }

@@ -1,5 +1,6 @@
 const removedEventsStorageKey = "gitnation-removed-schedule-events";
 const removedEventsEventName = "gitnation-removed-schedule-events-updated";
+const emptyRemovedIds = new Set<string>();
 
 let cachedRawRemovedIds: string | null | undefined;
 let cachedRemovedIds: Set<string> | undefined;
@@ -14,19 +15,19 @@ function writeRemovedIds(ids: Set<string>) {
 
 export function getRemovedScheduleEventIds(): Set<string> {
   if (typeof window === "undefined") {
-    return new Set();
+    return emptyRemovedIds;
   }
 
   const rawIds = window.localStorage.getItem(removedEventsStorageKey);
 
   if (rawIds === cachedRawRemovedIds) {
-    return cachedRemovedIds ?? new Set();
+    return cachedRemovedIds ?? emptyRemovedIds;
   }
 
   cachedRawRemovedIds = rawIds;
 
   if (!rawIds) {
-    cachedRemovedIds = new Set();
+    cachedRemovedIds = emptyRemovedIds;
     return cachedRemovedIds;
   }
 
@@ -34,7 +35,7 @@ export function getRemovedScheduleEventIds(): Set<string> {
     const parsedIds = JSON.parse(rawIds) as string[];
     cachedRemovedIds = new Set(parsedIds);
   } catch {
-    cachedRemovedIds = new Set();
+    cachedRemovedIds = emptyRemovedIds;
   }
 
   return cachedRemovedIds;

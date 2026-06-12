@@ -113,26 +113,26 @@ let cachedVisitedBooths: string[] | undefined;
 
 function getVisitedBoothIds() {
   if (typeof window === "undefined") {
-    return [];
+    return emptyVisitedBooths;
   }
 
   const rawVisitedBooths = window.localStorage.getItem(visitedBoothsStorageKey);
 
   if (rawVisitedBooths === cachedRawVisitedBooths) {
-    return cachedVisitedBooths ?? [];
+    return cachedVisitedBooths ?? emptyVisitedBooths;
   }
 
   cachedRawVisitedBooths = rawVisitedBooths;
 
   if (!rawVisitedBooths) {
-    cachedVisitedBooths = [];
-    return [];
+    cachedVisitedBooths = emptyVisitedBooths;
+    return cachedVisitedBooths;
   }
 
   try {
     cachedVisitedBooths = JSON.parse(rawVisitedBooths) as string[];
   } catch {
-    cachedVisitedBooths = [];
+    cachedVisitedBooths = emptyVisitedBooths;
   }
 
   return cachedVisitedBooths;
