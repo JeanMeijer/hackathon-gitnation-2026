@@ -6,7 +6,7 @@
   --event-type-talk: #1274ac;
   --event-type-meeting: #3a9b23;
   --event-type-break: #656565;
-  --event-type-custom: #7630bc;
+  --event-type-workshop: #7630bc;
 }
 
 @theme inline {
@@ -192,8 +192,8 @@ body {
   color: var(--event-type-break);
 }
 
-.my-schedule-embedded .schedule-event-type-custom {
-  color: var(--event-type-custom);
+.my-schedule-embedded .schedule-event-type-workshop {
+  color: var(--event-type-workshop);
 }
 
 .my-schedule-embedded .k-event.schedule-event-shadow,
@@ -323,13 +323,13 @@ body {
   background-color: color-mix(in srgb, var(--event-type-break) 10%, transparent);
 }
 
-.activity-picker-type-button-custom,
-.activity-picker-category-pill-custom,
-.event-type-filter-pill-custom {
-  --event-type-color: var(--event-type-custom);
-  color: var(--event-type-custom);
-  border-color: var(--event-type-custom);
-  background-color: color-mix(in srgb, var(--event-type-custom) 10%, transparent);
+.activity-picker-type-button-workshop,
+.activity-picker-category-pill-workshop,
+.event-type-filter-pill-workshop {
+  --event-type-color: var(--event-type-workshop);
+  color: var(--event-type-workshop);
+  border-color: var(--event-type-workshop);
+  background-color: color-mix(in srgb, var(--event-type-workshop) 10%, transparent);
 }
 
 .activity-picker-type-icon {
@@ -688,6 +688,6 @@ body {
   color: var(--event-type-break);
 }
 
-.event-type-label-pill-custom {
-  color: var(--event-type-custom);
+.event-type-label-pill-workshop {
+  color: var(--event-type-workshop);
 }

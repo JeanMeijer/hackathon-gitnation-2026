@@ -7,14 +7,14 @@ export const EVENT_TYPE_THEME: Record<
   talk: { label: "Talk", color: "#1274AC" },
   meeting: { label: "Meeting", color: "#3A9B23" },
   break: { label: "Break", color: "#656565" },
-  custom: { label: "Custom", color: "#7630BC" },
+  workshop: { label: "Workshop", color: "#7630BC" },
 };
 
 export const EVENT_TYPE_ORDER: ScheduleEventType[] = [
   "talk",
   "meeting",
   "break",
-  "custom",
+  "workshop",
 ];
 
 export function getEventTypeColor(type: ScheduleEventType): string {

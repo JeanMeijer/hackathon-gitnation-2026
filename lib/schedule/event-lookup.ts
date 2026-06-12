@@ -48,7 +48,7 @@ export function getEventTypeLabel(type: ScheduleEventType): string {
 }
 
 export function getEventDescription(event: ScheduleEvent): string {
-  if (event.type === "custom" && event.description) {
+  if (event.type === "workshop" && event.description) {
     return event.description;
   }
 
@@ -93,7 +93,7 @@ export function getEventLocationLabel(event: ScheduleEvent): string | undefined 
 
   if (
     event.type === "meeting" ||
-    event.type === "custom" ||
+    event.type === "workshop" ||
     event.type === "break"
   ) {
     return event.location;

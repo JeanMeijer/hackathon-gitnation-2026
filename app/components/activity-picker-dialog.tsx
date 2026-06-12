@@ -60,7 +60,7 @@ const EVENT_TYPE_ICONS: Record<ScheduleEventType, SVGIcon> = {
   talk: microphoneIcon,
   meeting: usersIcon,
   break: foodIcon,
-  custom: sparklesIcon,
+  workshop: sparklesIcon,
 };
 
 const TIME_FORMAT: Intl.DateTimeFormatOptions = {

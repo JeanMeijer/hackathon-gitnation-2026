@@ -1,4 +1,4 @@
-export type ScheduleEventType = "talk" | "custom" | "meeting" | "break";
+export type ScheduleEventType = "talk" | "workshop" | "meeting" | "break";
 
 interface ScheduleEventBase {
   id: string;
@@ -13,8 +13,8 @@ export interface TalkScheduleEvent extends ScheduleEventBase {
   trackName?: string;
 }
 
-export interface CustomScheduleEvent extends ScheduleEventBase {
-  type: "custom";
+export interface WorkshopScheduleEvent extends ScheduleEventBase {
+  type: "workshop";
   description?: string;
   location?: string;
 }
@@ -32,7 +32,7 @@ export interface BreakScheduleEvent extends ScheduleEventBase {
 
 export type ScheduleEvent =
   | TalkScheduleEvent
-  | CustomScheduleEvent
+  | WorkshopScheduleEvent
   | MeetingScheduleEvent
   | BreakScheduleEvent;
 
