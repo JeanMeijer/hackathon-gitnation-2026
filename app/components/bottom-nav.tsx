@@ -12,7 +12,6 @@ import {
   heartIcon,
   homeIcon,
   userIcon,
-  usersIcon,
 } from "@progress/kendo-svg-icons";
 
 interface NavItem {
@@ -30,8 +29,7 @@ const items: NavItem[] = [
     matchRoutes: ["/", "/event"],
   },
   { text: "Discover", svgIcon: heartIcon, route: "/discover" },
-  { text: "Invites", svgIcon: envelopeIcon, route: "/invites" },
-  { text: "Contacts", svgIcon: usersIcon, route: "/contacts" },
+  { text: "People", svgIcon: envelopeIcon, route: "/people" },
   { text: "Profile", svgIcon: userIcon, route: "/profile" },
 ];
 

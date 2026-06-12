@@ -81,7 +81,11 @@ function getMeetingContactName(meeting: BookedMeeting) {
   return meeting.attendees?.[0] ?? meeting.title.replace(/^Meet\s+/i, "");
 }
 
-export default function ContactsView() {
+interface ContactsViewProps {
+  onOpenInvites: () => void;
+}
+
+export default function ContactsView({ onOpenInvites }: ContactsViewProps) {
   const router = useRouter();
   const bookedMeetings = useSyncExternalStore(
     subscribeToBookedMeetings,
@@ -90,17 +94,17 @@ export default function ContactsView() {
   );
 
   return (
-    <main className={styles.shell}>
-      <div className={styles.wrap}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Contacts</h1>
-          <p className={styles.summary}>
-            People you have met at GitNation and the meetups already on your
-            schedule.
-          </p>
-        </header>
-
-        <section className={styles.grid} aria-label="Contacts lists">
+    <div className="grid gap-6 px-4">
+      <header className="flex flex-col gap-2 text-start">
+        <h1 className="text-xl font-extrabold leading-tight text-neutral-900">
+          Contacts
+        </h1>
+        <p className="leading-normal text-neutral-500">
+          People you have met at GitNation and the meetups already on your
+          schedule.
+        </p>
+      </header>
+      <section className={styles.grid} aria-label="Contacts lists">
           <Card className={styles.panel} orientation="vertical">
             <CardBody className={styles.panelBody}>
               <div className={styles.panelHeader}>
@@ -162,7 +166,7 @@ export default function ContactsView() {
                 <Button
                   fillMode="flat"
                   themeColor="primary"
-                  onClick={() => router.push("/invites#received")}
+                  onClick={onOpenInvites}
                 >
                   Invites
                 </Button>
@@ -218,7 +222,7 @@ export default function ContactsView() {
                   </p>
                   <Button
                     themeColor="primary"
-                    onClick={() => router.push("/invites#received")}
+                    onClick={onOpenInvites}
                   >
                     Open invites
                   </Button>
@@ -226,8 +230,7 @@ export default function ContactsView() {
               )}
             </CardBody>
           </Card>
-        </section>
-      </div>
-    </main>
+      </section>
+    </div>
   );
 }

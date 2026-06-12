@@ -282,7 +282,7 @@ export default function HomeDashboard() {
                 size="medium"
                 themeColor="primary"
                 svgIcon={envelopeIcon}
-                onClick={() => router.push("/invites")}
+                onClick={() => router.push("/people")}
               >
                 Invites
               </Button>
@@ -292,9 +292,9 @@ export default function HomeDashboard() {
                   orientation="vertical"
                   role="button"
                   tabIndex={0}
-                  onClick={() => router.push("/invites#received")}
+                  onClick={() => router.push("/people#received")}
                   onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                    handleStatCardKeyDown(event, "/invites#received", router.push)
+                    handleStatCardKeyDown(event, "/people#received", router.push)
                   }
                 >
                   <CardBody className={styles.statCardBody}>
@@ -319,9 +319,9 @@ export default function HomeDashboard() {
                   orientation="vertical"
                   role="button"
                   tabIndex={0}
-                  onClick={() => router.push("/invites#sent")}
+                  onClick={() => router.push("/people#sent")}
                   onKeyDown={(event: KeyboardEvent<HTMLDivElement>) =>
-                    handleStatCardKeyDown(event, "/invites#sent", router.push)
+                    handleStatCardKeyDown(event, "/people#sent", router.push)
                   }
                 >
                   <CardBody className={styles.statCardBody}>

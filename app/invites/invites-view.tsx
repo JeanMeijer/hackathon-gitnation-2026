@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Chip } from "@progress/kendo-react-buttons";
+import { DateTimePicker } from "@progress/kendo-react-dateinputs";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import { Input } from "@progress/kendo-react-inputs";
 import { Label } from "@progress/kendo-react-labels";
@@ -71,15 +72,8 @@ function getDefaultLocation(inviteId: string) {
   return defaults[inviteId] ?? "GitNation venue";
 }
 
-function toDateTimeInputValue(date: Date) {
-  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return localDate.toISOString().slice(0, 16);
-}
-
-function parseDateTimeInput(value: string) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
+const bookingMinDate = new Date(2026, 5, 11, 8, 0);
+const bookingMaxDate = new Date(2026, 5, 13, 20, 0);
 
 export default function InvitesView() {
   const router = useRouter();
@@ -96,13 +90,11 @@ export default function InvitesView() {
   const [bookingInvite, setBookingInvite] = useState<ReceivedInvite | null>(
     null,
   );
-  const [bookingStart, setBookingStart] = useState("");
-  const [bookingEnd, setBookingEnd] = useState("");
+  const [bookingStartDate, setBookingStartDate] = useState<Date | null>(null);
+  const [bookingEndDate, setBookingEndDate] = useState<Date | null>(null);
   const [bookingLocation, setBookingLocation] = useState("");
   const [bookingSubmitted, setBookingSubmitted] = useState(false);
 
-  const bookingStartDate = parseDateTimeInput(bookingStart);
-  const bookingEndDate = parseDateTimeInput(bookingEnd);
   const cleanBookingLocation = bookingLocation.trim();
   const hasBookingError =
     bookingSubmitted &&
@@ -121,8 +113,8 @@ export default function InvitesView() {
     const end = bookedMeeting?.end ?? addMinutes(start, 30);
 
     setBookingInvite(invite);
-    setBookingStart(toDateTimeInputValue(start));
-    setBookingEnd(toDateTimeInputValue(end));
+    setBookingStartDate(start);
+    setBookingEndDate(end);
     setBookingLocation(bookedMeeting?.location ?? getDefaultLocation(invite.id));
     setBookingSubmitted(false);
   }
@@ -151,17 +143,17 @@ export default function InvitesView() {
   }
 
   return (
-    <main className={styles.shell}>
-      <div className={styles.wrap}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>Invites</h1>
-          <p className={styles.summary}>
-            Track people who want to meet you and everyone you have invited from
-            Discover.
-          </p>
-        </header>
-
-        <div className={styles.grid}>
+    <div className="grid gap-6 px-4">
+      <header className="flex flex-col gap-2 text-start">
+        <h1 className="text-xl font-extrabold leading-tight text-neutral-900">
+          Invites
+        </h1>
+        <p className="leading-normal text-neutral-500">
+          Track people who want to meet you and everyone you have invited from
+          Discover.
+        </p>
+      </header>
+      <div className={styles.grid}>
           <Card
             id="received"
             className={styles.panel}
@@ -297,7 +289,6 @@ export default function InvitesView() {
               )}
             </CardBody>
           </Card>
-        </div>
       </div>
 
       {bookingInvite ? (
@@ -313,27 +304,23 @@ export default function InvitesView() {
 
             <div className={styles.field}>
               <Label editorId="booking-start">Start</Label>
-              <input
+              <DateTimePicker
                 id="booking-start"
-                className={styles.dateTimeInput}
-                type="datetime-local"
-                min="2026-06-11T08:00"
-                max="2026-06-13T19:30"
-                value={bookingStart}
-                onChange={(event) => setBookingStart(event.currentTarget.value)}
+                min={bookingMinDate}
+                max={bookingMaxDate}
+                value={bookingStartDate}
+                onChange={(event) => setBookingStartDate(event.value)}
               />
             </div>
 
             <div className={styles.field}>
               <Label editorId="booking-end">End</Label>
-              <input
+              <DateTimePicker
                 id="booking-end"
-                className={styles.dateTimeInput}
-                type="datetime-local"
-                min="2026-06-11T08:30"
-                max="2026-06-13T20:00"
-                value={bookingEnd}
-                onChange={(event) => setBookingEnd(event.currentTarget.value)}
+                min={bookingMinDate}
+                max={bookingMaxDate}
+                value={bookingEndDate}
+                onChange={(event) => setBookingEndDate(event.value)}
               />
             </div>
 
@@ -362,6 +349,6 @@ export default function InvitesView() {
           </DialogActionsBar>
         </Dialog>
       ) : null}
-    </main>
+    </div>
   );
 }
