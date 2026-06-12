@@ -101,6 +101,14 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
     null
   );
 
+  // Dev-only control: hidden everywhere but localhost. Computed after mount so
+  // the server-rendered markup (no `window`) matches the first client render.
+  const [isLocalhost, setIsLocalhost] = useState(false);
+  useEffect(() => {
+    const { hostname } = window.location;
+    setIsLocalhost(hostname === "localhost" || hostname === "127.0.0.1");
+  }, []);
+
   const realEvents = useMemo(
     () =>
       [...baseEvents, ...bookedMeetings, ...customEvents].sort(
@@ -246,9 +254,11 @@ export default function MySchedule({ variant = "page" }: MyScheduleProps) {
         >
           Current conference: Close Registration
         </Button>
-        <Button size="small" fillMode="flat" onClick={handleClearMeetups}>
-          Clear meetups
-        </Button>
+        {isLocalhost ? (
+          <Button size="small" fillMode="flat" onClick={handleClearMeetups}>
+            Clear meetups
+          </Button>
+        ) : null}
       </div>
 
       <ActivityPickerDialog
