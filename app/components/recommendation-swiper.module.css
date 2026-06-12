@@ -42,7 +42,7 @@
 .deck {
   position: relative;
   width: min(100%, 500px);
-  height: clamp(470px, 68vh, 560px);
+  height: clamp(570px, 72vh, 640px);
   outline: none;
 }
 
@@ -110,10 +110,10 @@
 
 .cardHeader {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   justify-items: center;
   border: 0;
-  padding: 26px 24px 0;
+  padding: 24px 24px 0;
   text-align: center;
 }
 
@@ -129,20 +129,44 @@
   font-size: 1.7rem;
   font-weight: 760;
   line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.role {
+  margin: 0;
+  color: #46504a;
+  font-size: 0.95rem;
+  font-weight: 760;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  width: min(100%, 24rem);
+  margin: 4px 0 0;
+  color: #5d665f;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.cardBody {
+  min-height: 0;
+  padding: 16px 24px 24px;
 }
 
 .profileLayout {
   display: grid;
   grid-template-columns: 1fr;
   align-items: center;
-  gap: 22px;
-  padding-top: 6px;
+  gap: 18px;
 }
 
 .avatarMatch {
   position: relative;
-  width: 178px;
-  height: 178px;
+  width: 164px;
+  height: 164px;
   display: grid;
   place-items: center;
   justify-self: center;
@@ -188,7 +212,8 @@
 
 .techPanel {
   display: grid;
-  gap: 14px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .panelLabel {
@@ -199,28 +224,33 @@
 }
 
 .techList {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
   padding: 0;
   margin: 0;
   list-style: none;
 }
 
 .techPill {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 42px;
-  padding: 10px 12px;
+  min-width: 0;
+  min-height: 38px;
+  padding: 9px 11px;
   border: 1px solid rgba(23, 32, 28, 0.12);
   border-radius: 8px;
   background: #fbfcfa;
   color: #24302a;
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .techPill::before {
+  flex: 0 0 auto;
   width: 8px;
   height: 8px;
   border-radius: 2px;
@@ -326,8 +356,8 @@
 
   .deck {
     width: min(100%, 350px);
-    height: min(500px, 66vh);
-    min-height: 430px;
+    height: min(610px, 76vh);
+    min-height: 540px;
   }
 
   .title {
@@ -335,22 +365,51 @@
   }
 
   .cardHeader {
-    padding: 20px 18px 0;
+    padding: 18px 18px 0;
   }
 
   .name {
     font-size: 1.45rem;
   }
 
+  .role {
+    font-size: 0.86rem;
+  }
+
+  .description {
+    font-size: 0.84rem;
+    line-height: 1.35;
+  }
+
+  .cardBody {
+    padding: 12px 16px 18px;
+  }
+
   .avatarMatch {
-    width: 154px;
-    height: 154px;
+    width: 134px;
+    height: 134px;
+  }
+
+  .profileLayout {
+    gap: 14px;
+  }
+
+  .techPanel {
+    gap: 9px;
+  }
+
+  .techList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
+    gap: 8px;
   }
 
   .techPill {
-    min-height: 38px;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 36px;
     padding: 8px 10px;
-    font-size: 0.92rem;
+    font-size: 0.84rem;
   }
 
   .actions {
@@ -365,8 +424,8 @@
 
 @media (min-width: 560px) {
   .profileLayout {
-    grid-template-columns: minmax(178px, 0.9fr) minmax(0, 1fr);
-    gap: 24px;
+    grid-template-columns: minmax(164px, 0.82fr) minmax(0, 1fr);
+    gap: 22px;
   }
 
   .techPanel {

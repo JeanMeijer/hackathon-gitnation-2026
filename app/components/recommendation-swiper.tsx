@@ -2,8 +2,10 @@
 
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
@@ -16,16 +18,24 @@ import {
   CardTitle,
 } from "@progress/kendo-react-layout";
 import { cancelIcon, usersIcon } from "@progress/kendo-svg-icons";
-import { saveSentInvite } from "../invites/invite-data";
+import {
+  getSentInvites,
+  saveSentInvite,
+  subscribeToSentInvites,
+  type SentInvite,
+} from "../invites/invite-data";
 import ProfileAvatar from "./profile-avatar";
 import styles from "./recommendation-swiper.module.css";
 
 type Decision = "next" | "meet";
 
 type Profile = {
+  company: string;
+  description: string;
   id: string;
   name: string;
   technologies: string[];
+  title: string;
   match: number;
 };
 
@@ -48,69 +58,113 @@ type CardVars = CSSProperties & {
 
 const profiles: Profile[] = [
   {
+    company: "TechCorp",
+    description:
+      "Frontend developer with a passion for React and design systems.",
     id: "mira",
     name: "Mira Patel",
     technologies: ["React", "KendoReact", "Design Systems", "TypeScript"],
+    title: "Frontend Developer",
     match: 96,
   },
   {
+    company: "Runtime Labs",
+    description:
+      "Builds product-facing infrastructure for server-rendered apps and data-rich workflows.",
     id: "noah",
     name: "Noah Kim",
     technologies: ["Next.js", "Postgres", "Drizzle", "Data Viz"],
+    title: "Full-stack Engineer",
     match: 91,
   },
   {
+    company: "QueryCraft",
+    description:
+      "Creates developer tools that make APIs easier to model, test, and explain.",
     id: "lena",
     name: "Lena Ortiz",
     technologies: ["Node.js", "GraphQL", "Developer Tools", "DX"],
+    title: "Developer Experience Lead",
     match: 88,
   },
   {
+    company: "AgentWorks",
+    description:
+      "Designs agentic workflows for teams automating internal tools and support systems.",
     id: "samir",
     name: "Samir Haddad",
     technologies: ["AI Agents", "Python", "APIs", "Automation"],
+    title: "AI Platform Engineer",
     match: 84,
   },
   {
+    company: "Signal Studio",
+    description:
+      "Researches accessible mobile experiences and test strategies for product teams.",
     id: "ava",
     name: "Ava Brooks",
     technologies: ["Accessibility", "React Native", "Testing", "UX Research"],
+    title: "UX Engineer",
     match: 79,
   },
   {
+    company: "EdgeWorks",
+    description:
+      "Keeps real-time systems observable, resilient, and fast at the network edge.",
     id: "kai",
     name: "Kai Morgan",
     technologies: ["Edge Runtime", "WebSockets", "Node.js", "Observability"],
+    title: "Infrastructure Engineer",
     match: 86,
   },
   {
+    company: "Northstar Design",
+    description:
+      "Bridges component libraries and interaction design for polished product surfaces.",
     id: "zoe",
     name: "Zoe Ivers",
     technologies: ["Design Systems", "Figma Plugins", "KendoReact", "Motion"],
+    title: "Design Systems Lead",
     match: 83,
   },
   {
+    company: "TrustLayer",
+    description:
+      "Ships secure auth flows and backend APIs for teams with strict compliance needs.",
     id: "dante",
     name: "Dante Ford",
     technologies: ["APIs", "Auth", "Postgres", "Security"],
+    title: "Security Engineer",
     match: 81,
   },
   {
+    company: "ProductLoop",
+    description:
+      "Turns AI prototypes into clear product decisions, evals, and launch plans.",
     id: "mina",
     name: "Mina Rao",
     technologies: ["AI Agents", "RAG", "TypeScript", "Product Strategy"],
+    title: "AI Product Strategist",
     match: 89,
   },
   {
+    company: "Shipshape CI",
+    description:
+      "Helps teams make automated tests faster, calmer, and easier to debug.",
     id: "oscar",
     name: "Oscar Novak",
     technologies: ["Testing", "Playwright", "CI", "Developer Experience"],
+    title: "Quality Engineer",
     match: 77,
   },
   {
+    company: "Open Frontend",
+    description:
+      "Builds inclusive developer communities around mentoring, accessibility, and React.",
     id: "imani",
     name: "Imani Reed",
     technologies: ["Accessibility", "Community Building", "React", "Mentoring"],
+    title: "Community Engineer",
     match: 85,
   },
 ];
@@ -123,6 +177,7 @@ const initialDrag: DragState = {
   y: 0,
 };
 
+const emptySentInvites: SentInvite[] = [];
 const swipeThreshold = 96;
 const ringRadius = 54;
 const ringCircumference = 2 * Math.PI * ringRadius;
@@ -135,9 +190,26 @@ export default function RecommendationSwiper() {
     direction: Decision;
   } | null>(null);
   const [announcement, setAnnouncement] = useState(
-    `Showing ${profiles[0].name}, profile 1 of ${profiles.length}.`,
+    "Recommendations loaded.",
   );
   const animationTimer = useRef<number | null>(null);
+  const sentInvites = useSyncExternalStore(
+    subscribeToSentInvites,
+    getSentInvites,
+    () => emptySentInvites,
+  );
+  const sentInviteIds = useMemo(
+    () => new Set(sentInvites.map((invite) => invite.id)),
+    [sentInvites],
+  );
+  const recommendations = useMemo(
+    () =>
+      profiles.filter(
+        (profile) =>
+          !sentInviteIds.has(profile.id) || exiting?.profileId === profile.id,
+      ),
+    [exiting?.profileId, sentInviteIds],
+  );
 
   useEffect(() => {
     return () => {
@@ -147,8 +219,9 @@ export default function RecommendationSwiper() {
     };
   }, []);
 
-  const activeProfile = profiles[currentIndex];
-  const visibleProfiles = profiles.slice(currentIndex, currentIndex + 3);
+  const activeIndex = Math.min(currentIndex, recommendations.length);
+  const activeProfile = recommendations[activeIndex];
+  const visibleProfiles = recommendations.slice(activeIndex, activeIndex + 3);
   const dragIntent = drag.x > 28 ? "meet" : drag.x < -28 ? "next" : undefined;
 
   function commitSwipe(direction: Decision) {
@@ -156,7 +229,16 @@ export default function RecommendationSwiper() {
       return;
     }
 
-    const nextProfile = profiles[currentIndex + 1];
+    const nextProfile = recommendations[activeIndex + 1];
+    const nextTotal =
+      direction === "meet"
+        ? Math.max(recommendations.length - 1, 0)
+        : recommendations.length;
+    const nextPosition =
+      direction === "meet" ? activeIndex + 1 : activeIndex + 2;
+
+    setExiting({ profileId: activeProfile.id, direction });
+    setDrag(initialDrag);
 
     if (direction === "meet") {
       saveSentInvite({
@@ -167,16 +249,12 @@ export default function RecommendationSwiper() {
       });
     }
 
-    setExiting({ profileId: activeProfile.id, direction });
-    setDrag(initialDrag);
     setAnnouncement(
       `${direction === "meet" ? "Meet selected for" : "See you next time for"} ${
         activeProfile.name
       }. ${
         nextProfile
-          ? `Showing ${nextProfile.name}, profile ${currentIndex + 2} of ${
-              profiles.length
-            }.`
+          ? `Showing ${nextProfile.name}, profile ${nextPosition} of ${nextTotal}.`
           : "All recommendations reviewed."
       }`,
     );
@@ -186,7 +264,11 @@ export default function RecommendationSwiper() {
     }
 
     animationTimer.current = window.setTimeout(() => {
-      setCurrentIndex((index) => Math.min(index + 1, profiles.length));
+      setCurrentIndex((index) =>
+        direction === "meet"
+          ? Math.min(activeIndex, recommendations.length)
+          : Math.min(index + 1, recommendations.length),
+      );
       setExiting(null);
     }, 430);
   }
@@ -199,7 +281,11 @@ export default function RecommendationSwiper() {
     setCurrentIndex(0);
     setDrag(initialDrag);
     setExiting(null);
-    setAnnouncement(`Showing ${profiles[0].name}, profile 1 of ${profiles.length}.`);
+    setAnnouncement(
+      recommendations[0]
+        ? `Showing ${recommendations[0].name}, profile 1 of ${recommendations.length}.`
+        : "All recommendations reviewed.",
+    );
   }
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -267,7 +353,7 @@ export default function RecommendationSwiper() {
           <div className={styles.emptyState} aria-live="polite">
             <p className={styles.emptyTitle}>No more recommendations</p>
             <p className={styles.emptyCopy}>
-              Your meeting choices have been saved for this session.
+              People you have invited are hidden from the recommendation stack.
             </p>
             <Button
               themeColor="primary"
@@ -294,7 +380,7 @@ export default function RecommendationSwiper() {
             Recommended profiles
           </h1>
           <p className={styles.counter}>
-            {currentIndex + 1} of {profiles.length}
+            {activeIndex + 1} of {recommendations.length}
           </p>
         </div>
 
@@ -345,7 +431,11 @@ export default function RecommendationSwiper() {
                 role={isTopCard ? "group" : undefined}
                 aria-label={
                   isTopCard
-                    ? `${profile.name}. ${profile.match} percent match. Interested in ${profile.technologies.join(
+                    ? `${profile.name}, ${profile.title} at ${
+                        profile.company
+                      }. ${profile.description} ${
+                        profile.match
+                      } percent match. Interested in ${profile.technologies.join(
                         ", ",
                       )}.`
                     : undefined
@@ -365,8 +455,12 @@ export default function RecommendationSwiper() {
                 <CardHeader className={styles.cardHeader}>
                   <p className={styles.kicker}>Potential collaborator</p>
                   <CardTitle className={styles.name}>{profile.name}</CardTitle>
+                  <p className={styles.role}>
+                    {profile.title} · {profile.company}
+                  </p>
+                  <p className={styles.description}>{profile.description}</p>
                 </CardHeader>
-                <CardBody>
+                <CardBody className={styles.cardBody}>
                   <div className={styles.profileLayout}>
                     <div className={styles.avatarMatch}>
                       <svg
@@ -410,8 +504,9 @@ export default function RecommendationSwiper() {
                       </ul>
                     </div>
                     <p className={styles.srOnly}>
-                      {profile.name} is a {profile.match} percent match and is
-                      interested in {profile.technologies.join(", ")}.
+                      {profile.name} is {profile.title} at {profile.company},
+                      a {profile.match} percent match, and is interested in{" "}
+                      {profile.technologies.join(", ")}.
                     </p>
                   </div>
                 </CardBody>
