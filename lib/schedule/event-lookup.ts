@@ -1,4 +1,6 @@
 import { DEFAULT_VENUE_ADDRESS } from "@/lib/map/venue-location";
+import { getBookedMeetings } from "./booked-meetings";
+import { getCustomScheduleEvents } from "./custom-events";
 import { MOCK_EVENT_DETAILS } from "./mock-event-details";
 import { MOCK_CONFERENCE_SCHEDULE } from "./mock-conference-schedule";
 import { MOCK_USER_SCHEDULE } from "./mock-events";
@@ -25,9 +27,15 @@ function cloneEvent(event: ScheduleEvent): ScheduleEvent {
 }
 
 export function getMockEventById(id: string): ScheduleEvent | undefined {
+  return getScheduleEventById(id);
+}
+
+export function getScheduleEventById(id: string): ScheduleEvent | undefined {
   const event =
     MOCK_USER_SCHEDULE.find((item) => item.id === id) ??
-    MOCK_CONFERENCE_SCHEDULE.find((item) => item.id === id);
+    MOCK_CONFERENCE_SCHEDULE.find((item) => item.id === id) ??
+    getCustomScheduleEvents().find((item) => item.id === id) ??
+    getBookedMeetings().find((item) => item.id === id);
   return event ? cloneEvent(event) : undefined;
 }
 

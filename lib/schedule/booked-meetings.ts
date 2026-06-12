@@ -94,6 +94,20 @@ export function saveBookedMeeting(input: BookMeetingInput) {
   return meeting;
 }
 
+export function removeBookedMeeting(meetingId: string) {
+  const nextMeetings = getBookedMeetings().filter(
+    (meeting) => meeting.id !== meetingId,
+  );
+  const serializedMeetings = serializeMeetings(nextMeetings);
+
+  window.localStorage.setItem(bookedMeetingsStorageKey, serializedMeetings);
+  cachedRawMeetings = serializedMeetings;
+  cachedMeetings = nextMeetings;
+  window.dispatchEvent(new Event(bookedMeetingsEventName));
+
+  return nextMeetings;
+}
+
 export function subscribeToBookedMeetings(callback: () => void) {
   if (typeof window === "undefined") {
     return () => {};

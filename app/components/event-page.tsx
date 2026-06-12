@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
 import { Button } from "@progress/kendo-react-buttons";
 import { Card, CardBody, CardSubtitle, CardTitle } from "@progress/kendo-react-layout";
-import { checkIcon, chevronLeftIcon } from "@progress/kendo-svg-icons";
+import { chevronLeftIcon, directionsIcon } from "@progress/kendo-svg-icons";
 import EventMapDialog from "@/app/components/event-map-dialog";
+import JoinedBadge from "@/app/components/joined-badge";
 import {
   defaultUserProfile,
   getProfileSnapshot,
@@ -14,10 +15,13 @@ import {
 } from "@/app/profile/profile-data";
 import {
   addCustomScheduleEvent,
-  isScheduleEventJoined,
-  removeCustomScheduleEvent,
-  subscribeToCustomScheduleEvents,
 } from "@/lib/schedule/custom-events";
+import { MOCK_USER_SCHEDULE } from "@/lib/schedule/mock-events";
+import {
+  isEventOnUserSchedule,
+  removeEventFromUserSchedule,
+  subscribeToUserScheduleMembership,
+} from "@/lib/schedule/user-schedule-membership";
 import {
   formatEventDate,
   formatEventTimeRange,
@@ -25,7 +29,7 @@ import {
   getEventLocationDisplay,
   getEventLobbyAttendeeNames,
   getEventTypeLabel,
-  getMockEventById,
+  getScheduleEventById,
   isConferenceEvent,
 } from "@/lib/schedule/event-lookup";
 import { getEventTypeThemeClass } from "@/lib/schedule/event-type-theme";
@@ -70,16 +74,33 @@ function EventLocationRow({
 
 function EventDetails({
   event,
+  joined,
+  onUnregister,
   onViewMap,
 }: {
   event: ScheduleEvent;
+  joined: boolean;
+  onUnregister: () => void;
   onViewMap: () => void;
 }) {
   const description = getEventDescription(event);
 
   return (
-    <Card className="border-0 shadow-none">
-      <CardBody className="flex flex-col gap-5 p-0">
+    <Card className="event-details-card border-0 shadow-none">
+      <CardBody className="relative flex flex-col gap-5 p-0">
+        {joined ? (
+          <div className="event-details-joined-controls">
+            <JoinedBadge className="event-details-joined-badge" />
+            <button
+              type="button"
+              className="event-details-unregister-btn"
+              onClick={onUnregister}
+            >
+              Unregister
+            </button>
+          </div>
+        ) : null}
+
         <div className="flex flex-wrap items-center gap-2">
           <span
             className={[
@@ -201,28 +222,44 @@ function EventNotFound() {
 function EventJoinAction({
   event,
   joined,
-  onToggle,
+  onJoin,
+  onNavigate,
 }: {
   event: ScheduleEvent;
   joined: boolean;
-  onToggle: () => void;
+  onJoin: () => void;
+  onNavigate: () => void;
 }) {
-  if (!isConferenceEvent(event)) {
+  const joinable = isConferenceEvent(event);
+
+  if (!joined && !joinable) {
     return null;
   }
 
   return (
     <div className="border-t border-black/10 px-4 py-4">
-      <Button
-        fillMode={joined ? "outline" : "solid"}
-        themeColor={joined ? "base" : "primary"}
-        svgIcon={joined ? checkIcon : undefined}
-        size="large"
-        className="w-full"
-        onClick={onToggle}
-      >
-        {joined ? "Leave event" : "Join event"}
-      </Button>
+      {joined ? (
+        <Button
+          fillMode="solid"
+          themeColor="primary"
+          svgIcon={directionsIcon}
+          size="large"
+          className="w-full"
+          onClick={onNavigate}
+        >
+          Navigate
+        </Button>
+      ) : (
+        <Button
+          fillMode="solid"
+          themeColor="primary"
+          size="large"
+          className="w-full"
+          onClick={onJoin}
+        >
+          Join event
+        </Button>
+      )}
     </div>
   );
 }
@@ -230,29 +267,32 @@ function EventJoinAction({
 export default function EventPage({ eventId }: EventPageProps) {
   const router = useRouter();
   const [mapOpen, setMapOpen] = useState(false);
-  const event = getMockEventById(eventId);
+  const event = getScheduleEventById(eventId);
   const profile = useSyncExternalStore(
     subscribeToProfile,
     () => getProfileSnapshot(defaultUserProfile),
     () => defaultUserProfile,
   );
   const joined = useSyncExternalStore(
-    subscribeToCustomScheduleEvents,
-    () => isScheduleEventJoined(eventId),
-    () => false,
+    subscribeToUserScheduleMembership,
+    () => isEventOnUserSchedule(eventId),
+    () => MOCK_USER_SCHEDULE.some((item) => item.id === eventId),
   );
 
-  const handleToggleJoin = () => {
+  const handleJoin = () => {
     if (!event) {
       return;
     }
 
-    if (joined) {
-      removeCustomScheduleEvent(event.id);
+    addCustomScheduleEvent(event);
+  };
+
+  const handleUnregister = () => {
+    if (!event) {
       return;
     }
 
-    addCustomScheduleEvent(event);
+    removeEventFromUserSchedule(event.id);
   };
 
   if (!event) {
@@ -275,7 +315,12 @@ export default function EventPage({ eventId }: EventPageProps) {
       <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto px-4 py-5">
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-semibold leading-tight">{event.title}</h1>
-          <EventDetails event={event} onViewMap={() => setMapOpen(true)} />
+          <EventDetails
+            event={event}
+            joined={joined}
+            onUnregister={handleUnregister}
+            onViewMap={() => setMapOpen(true)}
+          />
         </div>
 
         <EventLobby event={event} currentUserName={profile.name} />
@@ -284,7 +329,8 @@ export default function EventPage({ eventId }: EventPageProps) {
       <EventJoinAction
         event={event}
         joined={joined}
-        onToggle={handleToggleJoin}
+        onJoin={handleJoin}
+        onNavigate={() => setMapOpen(true)}
       />
 
       <EventMapDialog
